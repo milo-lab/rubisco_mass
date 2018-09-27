@@ -11782,6 +11782,7 @@ div#notebook {
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">from</span>  <span class="nn">stats_helper</span> <span class="k">import</span> <span class="o">*</span>
 <span class="k">def</span> <span class="nf">dis_res</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;___</span><span class="se">\n</span><span class="s1">##### **Result**: </span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">___&#39;</span><span class="p">))</span>
 </pre></div>
@@ -11797,7 +11798,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Estimating-the-gobal-mass-of-leaves">Estimating the gobal mass of leaves<a class="anchor-link" href="#Estimating-the-gobal-mass-of-leaves">&#182;</a></h1><p>As part of our procedure for estimating the total number of Rubisco enzymes in the world, we first estimate the total mass of leaves globally.</p>
 <p>To achieve a global estimate of leaf mass we rely on two independent methodologies. The first is based on measurement of the total plant biomass and the mass fraction of leaves out of the total leaf biomass, and the second is based on estimating the total leaf area and converting the total leaf area into leaf mass.</p>
-<h2 id="Method-1---leaf-mass-fraction">Method 1 - leaf mass fraction<a class="anchor-link" href="#Method-1---leaf-mass-fraction">&#182;</a></h2><p>In order to estimate the average effective rate of Rubisco globally, we need to first estimate the total amount of Rubisco enzymes on Earth. To do that we rely on a recent meta-analysis which collected data on the lead, shoot and root mass fractions in several different biomes <a href="http://dx.doi.org/10.1111/j.1469-8137.2011.03952.x">(Poorter et al.)</a>. Here are the mean leaf, shoot, and root mass fractions in each biome:</p>
+<h2 id="Method-1---leaf-mass-fraction">Method 1 - leaf mass fraction<a class="anchor-link" href="#Method-1---leaf-mass-fraction">&#182;</a></h2><p>To estimate the total leaf mass based on mass frations, we combine estimates from Erb et al. on plant biomass in each biome, along with estimates of the average leaf mass fraction in each biome. Our estimates of the average leaf mass fraction in each biome are based a recent meta-analysis which collected data on the lead, shoot and root mass fractions in several different biomes <a href="http://dx.doi.org/10.1111/j.1469-8137.2011.03952.x">(Poorter et al. (2012))</a>. Here is the data:</p>
 
 </div>
 </div>
@@ -11808,7 +11809,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load data from Poorter et al.</span>
-<span class="n">fractions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/non_wood_biomass_data.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;Poorter&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">fractions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/literature_data.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;Poorter&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">fractions</span>
 </pre></div>
 
@@ -11846,11 +11847,23 @@ div#notebook {
     <tr style="text-align: right;">
       <th></th>
       <th>LMF</th>
-      <th>SMF</th>
-      <th>RMF</th>
+      <th>0.05</th>
+      <th>median</th>
+      <th>95</th>
+      <th>lower-fold</th>
+      <th>upper-fold</th>
+      <th>95% Std</th>
+      <th>N</th>
+      <th>95% SEM</th>
     </tr>
     <tr>
       <th>Biome</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -11860,50 +11873,98 @@ div#notebook {
     <tr>
       <th>Tundra</th>
       <td>0.09</td>
-      <td>0.37</td>
-      <td>0.69</td>
+      <td>0.005698</td>
+      <td>0.031339</td>
+      <td>0.248575</td>
+      <td>5.500000</td>
+      <td>7.931818</td>
+      <td>6.604922</td>
+      <td>15</td>
+      <td>1.628129</td>
     </tr>
     <tr>
       <th>Grassland</th>
       <td>0.17</td>
-      <td>0.27</td>
-      <td>0.77</td>
+      <td>0.009972</td>
+      <td>0.070513</td>
+      <td>0.509259</td>
+      <td>7.071429</td>
+      <td>7.222222</td>
+      <td>7.146428</td>
+      <td>10</td>
+      <td>1.862459</td>
     </tr>
     <tr>
       <th>Boreal forest</th>
       <td>0.04</td>
-      <td>0.75</td>
-      <td>0.21</td>
+      <td>0.006410</td>
+      <td>0.023504</td>
+      <td>0.095442</td>
+      <td>3.666667</td>
+      <td>4.060606</td>
+      <td>3.858612</td>
+      <td>40</td>
+      <td>1.238006</td>
     </tr>
     <tr>
       <th>Temperate forest</th>
       <td>0.03</td>
-      <td>0.76</td>
-      <td>0.21</td>
+      <td>0.006410</td>
+      <td>0.019231</td>
+      <td>0.049145</td>
+      <td>3.000000</td>
+      <td>2.555556</td>
+      <td>2.768875</td>
+      <td>70</td>
+      <td>1.129446</td>
     </tr>
     <tr>
       <th>Tropical forest</th>
       <td>0.02</td>
-      <td>0.82</td>
-      <td>0.16</td>
+      <td>0.006410</td>
+      <td>0.019231</td>
+      <td>0.029915</td>
+      <td>3.000000</td>
+      <td>1.555556</td>
+      <td>2.160247</td>
+      <td>40</td>
+      <td>1.129509</td>
     </tr>
     <tr>
       <th>Woodland</th>
       <td>0.06</td>
-      <td>0.57</td>
-      <td>0.36</td>
+      <td>0.033476</td>
+      <td>0.048433</td>
+      <td>0.101140</td>
+      <td>1.446809</td>
+      <td>2.088235</td>
+      <td>1.738182</td>
+      <td>15</td>
+      <td>1.153433</td>
     </tr>
     <tr>
       <th>Shrubland</th>
       <td>0.09</td>
-      <td>0.49</td>
-      <td>0.47</td>
+      <td>0.032051</td>
+      <td>0.096154</td>
+      <td>0.140313</td>
+      <td>3.000000</td>
+      <td>1.459259</td>
+      <td>2.092314</td>
+      <td>15</td>
+      <td>1.210000</td>
     </tr>
     <tr>
       <th>Desert</th>
       <td>0.09</td>
-      <td>0.28</td>
-      <td>0.56</td>
+      <td>0.023504</td>
+      <td>0.043447</td>
+      <td>0.262821</td>
+      <td>1.848485</td>
+      <td>6.049180</td>
+      <td>3.343923</td>
+      <td>10</td>
+      <td>1.464820</td>
     </tr>
   </tbody>
 </table>
@@ -11920,7 +11981,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We calculate weighted mean of leaf and root mass fractions. We use the fraction of total plant biomass in each biome as our weights from <a href="http://dx.doi.org/10.1038/ngeo2782">Erb et al.</a> for the weighted mean. Here is the data from Erb et al.:</p>
+<p>The data in Poorter et al. does not include values for croplands. To estimate the mean leaf mass fraction in crops, we use a recent dataset published by the same authors (<a href="https://doi.org/10.1111/nph.13571">Poorter et al. (2015)</a>). We calculate the geometric mean of the leaf mass fraction across the top 20 largest crops based on FAO data.</p>
 
 </div>
 </div>
@@ -11930,8 +11991,40 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define crop species</span>
+<span class="n">crop_species</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Saccharum officinarum&#39;</span><span class="p">,</span><span class="s1">&#39;Zea mays&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum aestivum&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum compactum&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum dicoccoides&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum dicoccoides x A. squarrosa&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum durum&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum monococcum&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum spelta&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum timopheevii&#39;</span><span class="p">,</span><span class="s1">&#39;Triticum turgidum&#39;</span><span class="p">,</span><span class="s1">&#39;Oryza sativa&#39;</span><span class="p">,</span><span class="s1">&#39;Solanum tuberosum&#39;</span><span class="p">,</span><span class="s1">&#39;Glycine max&#39;</span><span class="p">,</span><span class="s1">&#39;Elaeis guineensis&#39;</span><span class="p">,</span><span class="s1">&#39;Beta vulgaris&#39;</span><span class="p">,</span><span class="s1">&#39;Manihot esculenta&#39;</span><span class="p">,</span><span class="s1">&#39;Solanum lycopersicum&#39;</span><span class="p">,</span><span class="s1">&#39;Hordeum vulgare&#39;</span><span class="p">,</span><span class="s1">&#39;Musa spec.&#39;</span><span class="p">,</span><span class="s1">&#39;Malus domestica&#39;</span><span class="p">,</span><span class="s1">&#39;Cucumis sativus&#39;</span><span class="p">,</span><span class="s1">&#39;Vitis vinifera&#39;</span><span class="p">]</span>
+
+<span class="c1"># Load data from Poorter et al.</span>
+<span class="n">LMF_species</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/literature_data.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;Poorter2015&#39;</span><span class="p">)</span>
+
+<span class="c1"># Lookup crop species in Poorter et al.</span>
+<span class="n">crop_LMF</span> <span class="o">=</span> <span class="n">LMF_species</span><span class="p">[</span><span class="n">LMF_species</span><span class="o">.</span><span class="n">Species</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">crop_species</span><span class="p">)]</span>
+
+<span class="c1"># Calculate the geometric mean of the leaf mass fraction and use it as the fraction for crops</span>
+<span class="n">fractions</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cropland&#39;</span><span class="p">,</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmean</span><span class="p">(</span><span class="n">crop_LMF</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Species&#39;</span><span class="p">)[</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We calculate weighted mean of leaf mass fraction. We use the fraction of total plant biomass in each biome as our weights from <a href="https://doi.org/10.1038/nature25138">Erb et al.</a> for the weighted mean. Here is the data from Erb et al.:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load data on the total plant biomass in each biome from Erb et al.</span>
-<span class="n">biomes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/non_wood_biomass_data.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;Erb&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">biomes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/literature_data.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;Erb&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">biomes</span>
 </pre></div>
 
@@ -11945,7 +12038,7 @@ div#notebook {
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[3]:</div>
+<div class="prompt output_prompt">Out[4]:</div>
 
 
 
@@ -11968,53 +12061,65 @@ div#notebook {
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Biome</th>
       <th>Total biomass [Gt C]</th>
       <th>Categories included in Poorter</th>
+      <th>Remarks</th>
+    </tr>
+    <tr>
+      <th>Biome</th>
+      <th></th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>(Sub)tropical humid-moist forest</td>
-      <td>205</td>
+      <th>Tropical forests</th>
+      <td>257.063700</td>
       <td>Tropical forest</td>
+      <td>Includes tropical forests under managements an...</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>(Sub)tropical dry forest</td>
-      <td>25</td>
-      <td>Tropical forest</td>
+      <th>Temperate forests</th>
+      <td>39.458988</td>
+      <td>Temperate forest</td>
+      <td>Includes tropical forests under managements an...</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>(Sub)Tropical shrubland, desert, mountain</td>
-      <td>62</td>
+      <th>Boreal forests</th>
+      <td>35.977312</td>
+      <td>Boreal forest</td>
+      <td>Includes tropical forests under managements an...</td>
+    </tr>
+    <tr>
+      <th>Cropland</th>
+      <td>10.000000</td>
+      <td>Cropland</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Other wooded land</th>
+      <td>57.000000</td>
       <td>Shrubland</td>
+      <td>NaN</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>Temperate forest</td>
-      <td>22</td>
-      <td>Temperate forest</td>
+      <th>Natural grasslands</th>
+      <td>19.000000</td>
+      <td>Grassland</td>
+      <td>NaN</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>Temperate steppe, desert, mountain</td>
-      <td>27</td>
-      <td>Grassland, shrubland</td>
+      <th>Artifitial grasslands</th>
+      <td>7.000000</td>
+      <td>Grassland</td>
+      <td>NaN</td>
     </tr>
     <tr>
-      <th>5</th>
-      <td>Boreal forest</td>
-      <td>28</td>
-      <td>Boreal forest</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Boreal tundra, mountain, other</td>
-      <td>33</td>
+      <th>Unused non-forest</th>
+      <td>16.500000</td>
       <td>Tundra</td>
+      <td>Includes the category "Wilderness, productive,...</td>
     </tr>
   </tbody>
 </table>
@@ -12031,31 +12136,76 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The specific biomes in Erb et al. are not fully matching the biomes in Poorter et al., and thus we traslate between the biomes in the two studies:</p>
+<p>The specific biomes in Erb et al. are not fully matching the biomes in Poorter et al., and thus we traslate between the biomes in the two studies, and then merge the data. After we merge the data, we calculate the weighted average of the leaf mass fraction using the biomass of each biome as the weights:</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Calculate the sum of the mass fractions of leaves and roots</span>
-<span class="n">leaf_frac</span> <span class="o">=</span> <span class="n">fractions</span><span class="p">[</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">fractions</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Merge LMF data with the biomass of each biome</span>
+<span class="n">biome_LMF</span> <span class="o">=</span> <span class="n">biomes</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">fractions</span><span class="p">,</span><span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;Categories included in Poorter&#39;</span><span class="p">,</span><span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Calculate the total biomass of each biome by the biomes reported in Poorter et al.</span>
-<span class="n">tot_biomass</span> <span class="o">=</span> <span class="n">biomes</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Categories included in Poorter&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="c1"># Calculate the weighted average of the LMF</span>
+<span class="n">mean_LMF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;LMF&#39;</span><span class="p">],</span><span class="n">weights</span><span class="o">=</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;Total biomass [Gt C]&#39;</span><span class="p">])</span>
+</pre></div>
 
-<span class="c1"># For the temperate steppe, desert and mountain, we use the mean values from grassland and shrubland in Poorter et al.</span>
-<span class="n">leaf_frac</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Grassland, shrubland&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">leaf_frac</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Grassland&#39;</span><span class="p">],</span><span class="n">leaf_frac</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Shrubland&#39;</span><span class="p">]]))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</div>
+</div>
+</div>
 
-<span class="c1"># Set the non-woody fraction as a column in the biome data</span>
-<span class="n">tot_biomass</span><span class="p">[</span><span class="s1">&#39;Leaf fraction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaf_frac</span>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We also use the data in Poorter et al. (2015) to calculate the leaf mass fraction over all the grasses family except our crop species, to generate an additional estimate of the leaf mass fraction in grasslands:</p>
 
-<span class="c1"># Calculate the weighed average of the non-woody biomass fraction</span>
-<span class="n">mean_leaf_frac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">tot_biomass</span><span class="p">[</span><span class="s1">&#39;Leaf fraction&#39;</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span> <span class="n">tot_biomass</span><span class="p">[</span><span class="s1">&#39;Total biomass [Gt C]&#39;</span><span class="p">])</span>
-<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our global average for the leaf mass fraction is ≈</span><span class="si">%.0f</span><span class="s1"> percent&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">mean_leaf_frac</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create a copy of the leaf mass fraction dataframe</span>
+<span class="n">biome_LMF2</span> <span class="o">=</span> <span class="n">biome_LMF</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Take from Poorter et al. (2015) only grass species which are not crops</span>
+<span class="n">grassland_species</span> <span class="o">=</span> <span class="n">LMF_species</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">LMF_species</span><span class="o">.</span><span class="n">Species</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">crop_species</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LMF_species</span><span class="o">.</span><span class="n">Family</span> <span class="o">==</span> <span class="s1">&#39;Poaceae&#39;</span><span class="p">)]</span>
+
+<span class="c1"># Calculate the geometric mean of the LMF of the grass species and use it as the leaf mass fractions for grasslands</span>
+<span class="n">biome_LMF2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Categories included in Poorter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Grassland&#39;</span><span class="p">,</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmean</span><span class="p">(</span><span class="n">grassland_species</span><span class="o">.</span><span class="n">LMF</span><span class="p">)</span>
+
+<span class="c1"># Calculate the weighted average of the LMF</span>
+<span class="n">mean_LMF2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;LMF&#39;</span><span class="p">],</span><span class="n">weights</span><span class="o">=</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Total biomass [Gt C]&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As our best estimate of the leaf mass fraction, we use the geometric mean of our estimate with the grassland values based on Poorter et al. (2012) or Poorter et al. (2015):</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">best_leaf_frac</span> <span class="o">=</span> <span class="n">gmean</span><span class="p">([</span><span class="n">mean_LMF2</span><span class="p">,</span><span class="n">mean_LMF</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our global average for the leaf mass fraction is ≈</span><span class="si">%.0f</span><span class="s1"> percent&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">best_leaf_frac</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12074,7 +12224,7 @@ div#notebook {
 
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our global average for the leaf mass fraction is ≈4 percent</p>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our global average for the leaf mass fraction is ≈6 percent</p>
 <hr>
 
 </div>
@@ -12096,11 +12246,11 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">global_plant_mass</span> <span class="o">=</span><span class="mf">900e15</span>
-<span class="n">global_leaf_mass</span> <span class="o">=</span> <span class="n">global_plant_mass</span><span class="o">*</span><span class="n">mean_leaf_frac</span>
+<span class="n">global_leaf_mass</span> <span class="o">=</span> <span class="n">global_plant_mass</span><span class="o">*</span><span class="n">best_leaf_frac</span>
 <span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our estimate for the global leaf mass based on leaf mass fraction measurements is ≈</span><span class="si">%.0f</span><span class="s1"> Gt&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">global_leaf_mass</span><span class="o">/</span><span class="mf">1e15</span><span class="p">))</span>
 </pre></div>
 
@@ -12120,7 +12270,7 @@ div#notebook {
 
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our estimate for the global leaf mass based on leaf mass fraction measurements is ≈39 Gt</p>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our estimate for the global leaf mass based on leaf mass fraction measurements is ≈52 Gt</p>
 <hr>
 
 </div>
@@ -12135,7 +12285,114 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Method-2---Remote-sensing-based-leaf-mass">Method 2 - Remote sensing based leaf mass<a class="anchor-link" href="#Method-2---Remote-sensing-based-leaf-mass">&#182;</a></h2><p>In the notebook <a href="remote_sensing_based_leaf_mass.ipynb"><strong><code>remote_sensing_based_leaf_mass.ipynb</code></strong></a> we estimate that the total mass of leaves is ≈20 Gt.</p>
+<h2 id="Estimating-the-fraction-of-leaf-mass-in-herbaceous-plants">Estimating the fraction of leaf mass in herbaceous plants<a class="anchor-link" href="#Estimating-the-fraction-of-leaf-mass-in-herbaceous-plants">&#182;</a></h2><p>For our calculations in the next section (estimating the mass fraction of Rubisco out of leaf mass), we also calculate here the fraction of leaf mass that is woody or herbaceous:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Calculate the total mass of leaves in each biome (once for each value of the leaf mass fraction of grasslands)</span>
+<span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;Total biomass [Gt C]&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span>
+<span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Total biomass [Gt C]&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="n">woody</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Tropical forests&#39;</span><span class="p">,</span><span class="s1">&#39;Temperate forests&#39;</span><span class="p">,</span><span class="s1">&#39;Boreal forests&#39;</span><span class="p">,</span><span class="s1">&#39;Other wooded land&#39;</span><span class="p">]</span>
+
+<span class="n">woody_frac</span> <span class="o">=</span> <span class="n">biome_LMF</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">woody</span><span class="p">,</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">woody_frac2</span> <span class="o">=</span> <span class="n">biome_LMF2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">woody</span><span class="p">,</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">best_woody_frac</span> <span class="o">=</span> <span class="n">gmean</span><span class="p">([</span><span class="n">woody_frac</span><span class="p">,</span><span class="n">woody_frac2</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our best estimate is that leaves of herbaceous plants account for </span><span class="si">%.0f</span><span class="s1"> percent out of the total leaf mass based on leaf mass fraction&#39;</span> <span class="o">%</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">best_woody_frac</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our best estimate is that leaves of herbaceous plants account for 49 percent out of the total leaf mass based on leaf mass fraction</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We combine this estimate with our estimate of the fraction of leaf mass in herbaceous plants based on leaf area estimates, which we derive in the notebook <a href="01_remote_sensing_based_leaf_mass.ipynb"><strong><code>01_remote_sensing_based_leaf_mass.ipynb</code></strong></a> to be ≈20%. We use the geometric mean of the estimate based on leaf mass fraction and the estimate based on leaf are as our best estimate of the fraction of leaf mass that is herbabeous:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">best_herb_frac</span> <span class="o">=</span> <span class="n">gmean</span><span class="p">([</span><span class="mi">1</span><span class="o">-</span><span class="n">best_woody_frac</span><span class="p">,</span><span class="mf">0.23</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our best estimate is that leaves of herbaceous plants account for </span><span class="si">%.0f</span><span class="s1"> percent out of the total leaf mass&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">best_herb_frac</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our best estimate is that leaves of herbaceous plants account for 34 percent out of the total leaf mass</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the notebook <a href="01_remote_sensing_based_leaf_mass.ipynb"><strong><code>01_remote_sensing_based_leaf_mass.ipynb</code></strong></a> we also estimate that C4 plant leaves account for ≈25% of the total hebaceous plant leaf mass. We apply this fraction here to arrive at our best estimate for the fraction of C4 leaf mass and C3 leaf mass out of the total leaf mass. This means C3 herbacoues plants account for ≈25% of the total leaf mass and C4 plants account for ≈9% of the total leaf mass.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Method-2---Remote-sensing-based-leaf-mass">Method 2 - Remote sensing based leaf mass<a class="anchor-link" href="#Method-2---Remote-sensing-based-leaf-mass">&#182;</a></h2><p>In the notebook <a href="01_remote_sensing_based_leaf_mass.ipynb"><strong><code>remote_sensing_based_leaf_mass.ipynb</code></strong></a> we estimate that the total mass of leaves is ≈20 Gt.</p>
 <p>As our best estimate for the total mass of leaves, we use the geometric mean of the two methods:</p>
 
 </div>
@@ -12143,10 +12400,10 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">best_leaf_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">global_leaf_mass</span><span class="o">*</span><span class="mf">20e15</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">best_leaf_mass</span> <span class="o">=</span> <span class="n">gmean</span><span class="p">([</span><span class="n">global_leaf_mass</span><span class="p">,</span><span class="mf">20e15</span><span class="p">])</span>
 <span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our best estimate for the global leaf mass is ≈</span><span class="si">%.0f</span><span class="s1"> Gt&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">best_leaf_mass</span><span class="o">/</span><span class="mf">1e15</span><span class="p">))</span>
 </pre></div>
 
@@ -12166,7 +12423,7 @@ div#notebook {
 
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our best estimate for the global leaf mass is ≈28 Gt</p>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our best estimate for the global leaf mass is ≈32 Gt</p>
 <hr>
 
 </div>
@@ -12176,6 +12433,171 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Uncertainty-analysis">Uncertainty analysis<a class="anchor-link" href="#Uncertainty-analysis">&#182;</a></h1><p>To project the uncertainty associated with the estimate of the total mass of leaves, we first calculate the uncertainty around our estimate of the total mass of leaves based on the leaf mass fraction in each biome. We had to different estimates for the mass of leaves based on leaf mass fraction per biome - each one with a different value for the leaf mass fraction in grasslands. For each of those estimates we calculate the uncertainty associated with it. In addition, as our best estimate for the leaf mass fraction based of biome leaf mass fractions was calculated as the geometric mean of the two estimates, we use the differnce between the two estimates as a measure of the uncertainty associated with our final estimate. We use the highest uncertainty among these three uncertainties (one for each estimate and one based on the difference between the estimates) as our best projection for the uncertainty associated with our estimate of the total leaf mass based on biome leaf mass fractions.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Calculate the multiplicative uncertainty of the leaf mass in each biome (once for each value of the leaf mass fraction of grasslands)</span>
+<span class="c1"># We use the geometric mean of the standard deviation and standard error as our best projection of the uncertainty</span>
+<span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">gmean</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;95% Std&#39;</span><span class="p">],</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;95% SEM&#39;</span><span class="p">])]</span>
+<span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">gmean</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;95% Std&#39;</span><span class="p">],</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;95% SEM&#39;</span><span class="p">])]</span>
+
+<span class="c1"># For crops calculate the uncertainty based on the data in Poorter et al. (2015)</span>
+<span class="n">biome_LMF</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cropland&#39;</span><span class="p">,</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">(</span><span class="n">crop_LMF</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Species&#39;</span><span class="p">)[</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">biome_LMF2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cropland&#39;</span><span class="p">,</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">(</span><span class="n">crop_LMF</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Species&#39;</span><span class="p">)[</span><span class="s1">&#39;LMF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="c1"># For the second estiamte in which grassland values are based on Poorter et al. (2015), calculate the uncertainty </span>
+<span class="c1"># based on the values in Poorter et al. (2015)</span>
+<span class="n">biome_LMF2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Categories included in Poorter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Grassland&#39;</span><span class="p">,</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">(</span><span class="n">grassland_species</span><span class="o">.</span><span class="n">LMF</span><span class="p">)</span>
+
+<span class="c1"># Propagate the uncertainties to the final estimates</span>
+<span class="n">leaf_mass_frac_CI</span> <span class="o">=</span> <span class="n">CI_sum_prop</span><span class="p">(</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">],</span><span class="n">biome_LMF</span><span class="p">[</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">])</span>
+<span class="n">leaf_mass_frac_CI2</span> <span class="o">=</span> <span class="n">CI_sum_prop</span><span class="p">(</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;Total leaf mass [Gt]&#39;</span><span class="p">],</span><span class="n">biome_LMF2</span><span class="p">[</span><span class="s1">&#39;mul_CI&#39;</span><span class="p">])</span>
+
+<span class="c1"># Calculate uncertainty based on the difference between the estiamtes</span>
+<span class="n">inter_method_leaf_mass_fraction_CI</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">([</span><span class="n">mean_LMF</span><span class="p">,</span><span class="n">mean_LMF2</span><span class="p">])</span>
+
+<span class="c1"># Use the highest uncertainty as our best projection</span>
+<span class="n">best_leaf_mass_frac_CI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">leaf_mass_frac_CI2</span><span class="p">,</span><span class="n">leaf_mass_frac_CI</span><span class="p">,</span><span class="n">inter_method_leaf_mass_fraction_CI</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our projection for the uncertainty associated with our estimate of the mass fraction of leaves is ≈</span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">best_leaf_mass_frac_CI</span>)
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our projection for the uncertainty associated with our estimate of the mass fraction of leaves is ≈1.3-fold</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As for the total mass of plants, <a href="https://dx.doi.org/10.1073/pnas.1711842115">Bar-On et al.</a> projected an uncertainty of ≈1.2-fold associated with the total mass of plants. We combine the uncertainty associated with our estimate of the leaf mass fraction with the uncertainty associated with the total mass of plants:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tot_leaf_mass_frac_CI</span> <span class="o">=</span> <span class="n">CI_prod_prop</span><span class="p">([</span><span class="n">best_leaf_mass_frac_CI</span><span class="p">,</span><span class="mf">1.2</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our projection for the uncertainty associated with our estimate of the total mass of leaves based on leaf mass fraction is ≈</span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">tot_leaf_mass_frac_CI</span>)
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our projection for the uncertainty associated with our estimate of the total mass of leaves based on leaf mass fraction is ≈1.4-fold</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the notebook <a href="01_remote_sensing_based_leaf_mass.ipynb"><strong><code>remote_sensing_based_leaf_mass.ipynb</code></strong></a> we estimate that the uncertainty associated with the estimate of the total mass of leaves based on remote sensing is ≈2-fold. We can calculate the uncertainty based on the difference of the estimates based on the two different methodologies (leaf mass based and remote sensing based):</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inter_method_CI</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">([</span><span class="n">global_leaf_mass</span><span class="p">,</span><span class="mf">20e15</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our projection for the uncertainty associated with our estimate of the total mass of leaves based on the difference between our two independent methodologies is ≈</span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">inter_method_CI</span>)
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our projection for the uncertainty associated with our estimate of the total mass of leaves based on the difference between our two independent methodologies is ≈2.2-fold</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Overall, we use the highest uncertainty out of the uncertainties reported for each estimate and the uncertainty based on the difference between the different methodologies, which is ≈2.2-fold.</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>

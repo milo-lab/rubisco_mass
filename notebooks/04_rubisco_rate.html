@@ -11773,7 +11773,7 @@ div#notebook {
 
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import dependencies</span>
@@ -11782,6 +11782,7 @@ div#notebook {
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">from</span> <span class="nn">stats_helper</span> <span class="k">import</span> <span class="o">*</span>
 <span class="k">def</span> <span class="nf">dis_res</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;___</span><span class="se">\n</span><span class="s1">##### **Result**: </span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">___&#39;</span><span class="p">))</span>
 </pre></div>
@@ -11802,7 +11803,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The GPP estimate in Beer et al.</span>
@@ -11830,11 +11831,11 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Our estimate for the total mass of rubisco</span>
-<span class="n">tot_rub_mass</span> <span class="o">=</span> <span class="o">.</span><span class="mf">5e15</span> <span class="c1">#g</span>
+<span class="n">tot_rub_mass</span> <span class="o">=</span> <span class="o">.</span><span class="mf">7e15</span> <span class="c1">#g</span>
 
 <span class="c1"># The molecular weight of a rubisco per active site</span>
 <span class="n">rub_mol_w</span> <span class="o">=</span> <span class="mf">7e4</span> <span class="c1"># g/mol</span>
@@ -11863,7 +11864,7 @@ div#notebook {
 
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We estimate the average rate of Rubisco in the terrestrial environment at 0.04 s$^{-1}$</p>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We estimate the average rate of Rubisco in the terrestrial environment at 0.03 s$^{-1}$</p>
 <hr>
 
 </div>
@@ -11885,7 +11886,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">marine_gpp</span> <span class="o">=</span> <span class="mf">50e15</span><span class="o">*</span><span class="mf">1.45</span>
@@ -11910,7 +11911,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">tot_marine_rub_mass</span> <span class="o">=</span> <span class="mf">0.03e15</span>
@@ -11939,6 +11940,98 @@ div#notebook {
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
 <h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We estimate the average rate of Rubisco in the marine environment at 0.4 s$^{-1}$</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Uncertainty-analysis">Uncertainty analysis<a class="anchor-link" href="#Uncertainty-analysis">&#182;</a></h1><p>We project the uncertainty associated with our estimates of the time average rates for terrestrial and marine Rubisco.</p>
+<h4 id="Terrestrial-Rubisco">Terrestrial Rubisco<a class="anchor-link" href="#Terrestrial-Rubisco">&#182;</a></h4><p>Our projected uncertainty for our estimate of the total mass of terrestrial Rubisco is about 3-fold. As for the global GPP, estimates range between 120-175 Gt C yr$^{-1}$ (<a href="http://dx.doi.org/10.1126/science.1184984">Beer et al.</a> and <a href="https://doi.org/10.1038/nature10421">Welp et al.</a>). We use this range to project the uncertainty associated with the estimate of the global GPP, and then combine it with the uncertainty associated with the mass of terrestrial Rubisco to generate our projection for the unecrtainty associated with the time average rate of terrestrial Rubisco:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">terr_gpp_CI</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">([</span><span class="mi">120</span><span class="p">,</span><span class="mi">175</span><span class="p">])</span>
+<span class="n">terr_av_rate_CI</span> <span class="o">=</span> <span class="n">CI_prod_prop</span><span class="p">([</span><span class="mf">3.4</span><span class="p">,</span><span class="n">terr_gpp_CI</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;We project the uncertainty associated with our estimate of the average rate of Rubisco in the terrestrial environment at </span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">terr_av_rate_CI</span>)
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We project the uncertainty associated with our estimate of the average rate of Rubisco in the terrestrial environment at 3.5-fold</p>
+<hr>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Marine-Rubisco">Marine Rubisco<a class="anchor-link" href="#Marine-Rubisco">&#182;</a></h4><p>Our projected uncertainty for our estimate of the total mass of marine Rubisco is about 6-fold. As for the global marine GPP, we do not have a good source for estimating the uncertainty associated with it. We use 2-fold uncertianty as our estimate for the uncertainty associated with the estimate of the global marine GPP. We combine the uncertainties associated with our estimate of the total mass of marine Rubisco and the global marine GPP to generate our projection for the uncertainty associated with our estimate of the average rate of marine Rubisco:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mar_av_rate_CI</span> <span class="o">=</span> <span class="n">CI_prod_prop</span><span class="p">([</span><span class="mf">5.9</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;We project the uncertainty associated with our estimate of the average rate of Rubisco in the marine environment at </span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">mar_av_rate_CI</span>)
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<hr>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We project the uncertainty associated with our estimate of the average rate of Rubisco in the marine environment at 6.7-fold</p>
 <hr>
 
 </div>

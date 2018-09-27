@@ -11785,6 +11785,9 @@ div#notebook {
 <span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>sp<span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>rasterVis<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>gridExtra<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>grid<span class="p">)</span>
 
 <span class="c1"># Define function to adjust two rasters</span>
 adj_raster <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">,</span>crop_extent<span class="o">=</span><span class="kc">NULL</span><span class="p">){</span>
@@ -11829,6 +11832,42 @@ adj_raster <span class="o">=</span> <span class="kr">function</span><span class=
 gmean <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">){</span>
     <span class="kr">return</span><span class="p">(</span><span class="kp">exp</span><span class="p">(</span><span class="kp">mean</span><span class="p">(</span><span class="kp">log</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">)))))</span>
 <span class="p">}</span>
+
+<span class="c1"># Define a function to calculate the multiplicative 95% confidence interval of a list of measurements</span>
+mul_CI <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>vals<span class="p">){</span>
+    sem <span class="o">=</span> <span class="m">10</span><span class="o">^</span><span class="p">(</span>sd<span class="p">(</span><span class="kp">log10</span><span class="p">(</span>vals<span class="p">))</span><span class="o">/</span><span class="kp">sqrt</span><span class="p">(</span><span class="kp">length</span><span class="p">(</span>vals<span class="p">))</span><span class="o">*</span><span class="m">1.96</span><span class="p">)</span>
+    std <span class="o">=</span> <span class="m">10</span><span class="o">^</span><span class="p">(</span>sd<span class="p">(</span><span class="kp">log10</span><span class="p">(</span>vals<span class="p">))</span><span class="o">*</span><span class="m">1.96</span><span class="p">)</span>
+    <span class="kr">return</span><span class="p">(</span>gmean<span class="p">(</span>sem<span class="p">,</span>std<span class="p">))</span>
+<span class="p">}</span>
+
+<span class="c1"># Define a function to propagate uncertainties through a product</span>
+CI_prod_prop <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>mul_CIs<span class="p">){</span>
+    <span class="kr">return</span><span class="p">(</span><span class="m">10</span><span class="o">^</span><span class="kp">sqrt</span><span class="p">(</span><span class="kp">sum</span><span class="p">(</span><span class="kp">log10</span><span class="p">(</span>mul_CIs<span class="p">)</span><span class="o">^</span><span class="m">2</span><span class="p">)))</span>
+<span class="p">}</span>
+
+<span class="c1"># Define a funtion to overlay data in maps that may be in differnt sizes</span>
+overlay_maps <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">,</span> calc_sum<span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span>crop_extent<span class="o">=</span><span class="kc">NULL</span><span class="p">){</span>
+    <span class="c1"># Adjust the two rasters</span>
+    tmp <span class="o">=</span> adj_raster<span class="p">(</span>x<span class="p">,</span>y<span class="p">,</span>crop_extent<span class="o">=</span>crop_extent<span class="p">)</span>
+    res_x <span class="o">=</span> tmp<span class="p">[[</span><span class="m">1</span><span class="p">]]</span>
+    res_y <span class="o">=</span> tmp<span class="p">[[</span><span class="m">2</span><span class="p">]]</span>
+
+    <span class="c1"># Multiply the values in the two maps</span>
+    overlayed_map <span class="o">=</span> overlay<span class="p">(</span>res_x<span class="p">,</span>res_y<span class="p">,</span>fun<span class="o">=</span><span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">){</span>x<span class="o">*</span>y<span class="p">})</span>
+    <span class="kr">if</span><span class="p">(</span>calc_sum<span class="p">){</span>
+        
+        moll <span class="o">=</span> <span class="s">&#39;+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs&#39;</span>
+        
+        <span class="c1"># Project to an equal area projection</span>
+        overlayed_moll <span class="o">=</span> projectRaster<span class="p">(</span>overlayed_map<span class="p">,</span>crs<span class="o">=</span>moll<span class="p">)</span>
+
+        <span class="c1">#Calculate the total leaf mass</span>
+        tot_sum <span class="o">=</span> cellStats<span class="p">(</span>overlayed_moll<span class="p">,</span> stat <span class="o">=</span> <span class="s">&#39;sum&#39;</span><span class="p">)</span><span class="o">*</span><span class="kp">prod</span><span class="p">(</span>res<span class="p">(</span>overlayed_moll<span class="p">))</span>
+        <span class="kr">return</span><span class="p">(</span>tot_sum<span class="p">)</span>
+    <span class="p">}</span><span class="kr">else</span> <span class="p">{</span>
+        <span class="kr">return</span><span class="p">(</span>overlayed_map<span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 
 </div>
@@ -11855,6 +11894,16 @@ rgdal: version: 1.3-3, (SVN revision 759)
  Path to PROJ.4 shared files: (autodetected)
  Linking to sp version: 1.2-5 
 Loading required package: viridisLite
+Loading required package: lattice
+Loading required package: latticeExtra
+Loading required package: RColorBrewer
+
+Attaching package: ‘latticeExtra’
+
+The following object is masked from ‘package:ggplot2’:
+
+    layer
+
 </pre>
 </div>
 </div>
@@ -12021,7 +12070,7 @@ asner_LAI_data
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We use biome data from MODIS land cover product (<a href="http://glcf.umd.edu/data/lc/">http://glcf.umd.edu/data/lc/</a>). For each biome, we replace all the pixels whithin the biome with the mean LAI measured in the biome based on the table produced by Asner et al.</p>
+<p>We use biome data from MODIS land cover product (<a href="http://glcf.umd.edu/data/lc/">http://glcf.umd.edu/data/lc/</a> ). For each biome, we replace all the pixels whithin the biome with the mean LAI measured in the biome based on the table produced by Asner et al.</p>
 
 </div>
 </div>
@@ -12072,7 +12121,7 @@ asner_lai_map <span class="o">=</span> mapvalues<span class="p">(</span><span cl
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load tree cover data</span>
@@ -12091,7 +12140,7 @@ plant_frac_data <span class="o">=</span> <span class="p">(</span>SV_data<span cl
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>asner_lai_raster <span class="o">=</span> raster<span class="p">(</span>asner_lai_map<span class="p">)</span>
@@ -12109,22 +12158,17 @@ crs<span class="p">(</span>asner_lai_raster<span class="p">)</span> <span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="c1"># Adjust the two rasters</span>
-tmp <span class="o">=</span> adj_raster<span class="p">(</span>plant_frac_data<span class="p">,</span>asner_lai_raster<span class="p">)</span>
-res_plant_frac_data <span class="o">=</span> tmp<span class="p">[[</span><span class="m">1</span><span class="p">]]</span>
-res_asner_lai_raster <span class="o">=</span> tmp<span class="p">[[</span><span class="m">2</span><span class="p">]]</span>
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Multiply the map of the fraction of vegetation by the map of the ground based LAI measurements</span>
+asner_leaf_area_raster <span class="o">=</span> overlay_maps<span class="p">(</span>plant_frac_data<span class="p">,</span>asner_lai_raster<span class="p">)</span>
 
-<span class="c1"># Multiply the values of the two rasters in each point</span>
-tot_leaf_area_raster <span class="o">=</span> overlay<span class="p">(</span>res_plant_frac_data<span class="p">,</span>res_asner_lai_raster<span class="p">,</span> fun<span class="o">=</span><span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">){</span>x<span class="o">*</span>y<span class="p">})</span>
-
-<span class="c1"># Reproject data to equal area projection</span>
-tot_leaf_area_raster_moll <span class="o">=</span> projectRaster<span class="p">(</span>tot_leaf_area_raster<span class="p">,</span>crs<span class="o">=</span>moll<span class="p">)</span>
+<span class="c1"># Project to an equal area projection</span>
+asner_leaf_area_raster_moll <span class="o">=</span> projectRaster<span class="p">(</span>asner_leaf_area_raster<span class="p">,</span>crs<span class="o">=</span>moll<span class="p">)</span>
 
 <span class="c1">#Calculate the total leaf area</span>
-asner_total_leaf_area <span class="o">=</span> cellStats<span class="p">(</span>tot_leaf_area_raster_moll<span class="p">,</span> stat <span class="o">=</span> <span class="s">&#39;sum&#39;</span><span class="p">)</span><span class="o">*</span><span class="kp">prod</span><span class="p">(</span>res<span class="p">(</span>tot_leaf_area_raster_moll<span class="p">))</span>
+asner_total_leaf_area <span class="o">=</span> cellStats<span class="p">(</span>asner_leaf_area_raster_moll<span class="p">,</span> stat <span class="o">=</span> <span class="s">&#39;sum&#39;</span><span class="p">)</span><span class="o">*</span><span class="kp">prod</span><span class="p">(</span>res<span class="p">(</span>asner_leaf_area_raster_moll<span class="p">))</span>
 <span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;We estimate the total leaf area based on field measurements at: %.1e m^2&#39;</span><span class="p">,</span>asner_total_leaf_area<span class="p">)</span>
 </pre></div>
 
@@ -12174,7 +12218,7 @@ asner_total_leaf_area <span class="o">=</span> cellStats<span class="p">(</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the geometric mean of the estimates based on remote sensing nad ground measurements</span>
@@ -12210,21 +12254,21 @@ best_global_leaf_area <span class="o">=</span> gmean<span class="p">(</span>asne
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Converting-leaf-area-to-leaf-mass">Converting leaf area to leaf mass<a class="anchor-link" href="#Converting-leaf-area-to-leaf-mass">&#182;</a></h1><p>In order to convert leaf area to leaf mass, we rely on two methods. The first is based on the Glopnet database (<a href="http://bio.mq.edu.au/~iwright/glopian.htm">http://bio.mq.edu.au/~iwright/glopian.htm</a>). We use the median leaf mass per area (LMA) in g per m^2, and multiply it by the our best estimate for the total leaf area</p>
+<h1 id="Converting-leaf-area-to-leaf-mass">Converting leaf area to leaf mass<a class="anchor-link" href="#Converting-leaf-area-to-leaf-mass">&#182;</a></h1><p>In order to convert leaf area to leaf mass, we rely on two methods. The first is based on the Glopnet database (<a href="http://bio.mq.edu.au/~iwright/glopian.htm">http://bio.mq.edu.au/~iwright/glopian.htm</a>). We use the geometric mean of leaf mass per area (LMA) in g per m^2, and multiply it by the our best estimate for the total leaf area</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load glopnet data</span>
 glopnet_data <span class="o">=</span> read_excel<span class="p">(</span><span class="s">&#39;../data/literature_data.xlsx&#39;</span><span class="p">,</span><span class="s">&#39;glopnet_data&#39;</span><span class="p">,</span>skip <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 
 <span class="c1"># calculate the geometric mean of the LMA</span>
-glopnet_mean <span class="o">=</span> median<span class="p">(</span><span class="m">10</span><span class="o">^</span><span class="p">(</span>glopnet_data<span class="o">$</span><span class="sb">`log LMA`</span><span class="p">),</span> na.rm <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+glopnet_mean <span class="o">=</span> <span class="m">10</span><span class="o">^</span><span class="kp">mean</span><span class="p">((</span>glopnet_data<span class="o">$</span><span class="sb">`log LMA`</span><span class="p">),</span> na.rm <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 
 <span class="c1"># Multiply our best estimate of the total leaf area by the mean LMA to get the total mass of leaves</span>
 method1_mean <span class="o">=</span> best_global_leaf_area<span class="o">*</span>glopnet_mean
@@ -12246,7 +12290,7 @@ method1_mean <span class="o">=</span> best_global_leaf_area<span class="o">*</sp
 
 
 <div class="output_html rendered_html output_subarea ">
-'Our estimate for the total leaf mass based on glopnet is 22 Gt'
+'Our estimate for the total leaf mass based on glopnet is 23 Gt'
 </div>
 
 </div>
@@ -12266,7 +12310,7 @@ method1_mean <span class="o">=</span> best_global_leaf_area<span class="o">*</sp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load SMA data</span>
@@ -12321,23 +12365,17 @@ SLA_raster <span class="o">=</span> raster<span class="p">(</span>SLA_df<span cl
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the leaf mass based on ground measurements of LAI</span>
-
-<span class="c1"># Adjust the two rasters</span>
-tmp <span class="o">=</span> adj_raster<span class="p">(</span>tot_leaf_area_raster<span class="p">,</span>SLA_raster<span class="p">)</span>
-res_asner_leaf_area <span class="o">=</span> tmp<span class="p">[[</span><span class="m">1</span><span class="p">]]</span>
-res_SLA_raster <span class="o">=</span> tmp<span class="p">[[</span><span class="m">2</span><span class="p">]]</span>
-
-<span class="c1"># Multiply the values in the two maps to generate the leaf mass map</span>
-asner_leaf_mass_raster <span class="o">=</span> overlay<span class="p">(</span>res_asner_leaf_area<span class="p">,</span>res_SLA_raster<span class="p">,</span>fun<span class="o">=</span><span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">){</span>x<span class="o">*</span>y<span class="p">})</span>
+<span class="c1"># Multiply the mass of the leaf mass per unit area by the map of leaf area</span>
+asner_leaf_mass_raster <span class="o">=</span> overlay_maps<span class="p">(</span>asner_leaf_area_raster<span class="p">,</span>SLA_raster<span class="p">)</span>
 
 <span class="c1"># Project to an equal area projection</span>
 asner_leaf_mass_raster_moll <span class="o">=</span> projectRaster<span class="p">(</span>asner_leaf_mass_raster<span class="p">,</span>crs<span class="o">=</span>moll<span class="p">)</span>
 
-<span class="c1">#Calculate the total leaf mass</span>
+<span class="c1">#Calculate the total leaf area</span>
 asner_total_leaf_mass <span class="o">=</span> cellStats<span class="p">(</span>asner_leaf_mass_raster_moll<span class="p">,</span> stat <span class="o">=</span> <span class="s">&#39;sum&#39;</span><span class="p">)</span><span class="o">*</span><span class="kp">prod</span><span class="p">(</span>res<span class="p">(</span>asner_leaf_mass_raster_moll<span class="p">))</span>
 </pre></div>
 
@@ -12366,18 +12404,12 @@ asner_total_leaf_mass <span class="o">=</span> cellStats<span class="p">(</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the leaf mass based on remote sensing measurements of LAI</span>
-
-<span class="c1"># Adjust the two rasters</span>
-tmp <span class="o">=</span> adj_raster<span class="p">(</span>best_lai_raster<span class="p">,</span>SLA_raster<span class="p">)</span>
-res_best_lai_raster <span class="o">=</span> tmp<span class="p">[[</span><span class="m">1</span><span class="p">]]</span>
-res_SLA_raster <span class="o">=</span> tmp<span class="p">[[</span><span class="m">2</span><span class="p">]]</span>
-
-<span class="c1"># Multiply the values in the two maps to generate the leaf mass map</span>
-glass_leaf_mass_raster <span class="o">=</span> overlay<span class="p">(</span>res_best_lai_raster<span class="p">,</span>res_SLA_raster<span class="p">,</span>fun<span class="o">=</span><span class="kr">function</span><span class="p">(</span>x<span class="p">,</span>y<span class="p">){</span>x<span class="o">*</span>y<span class="p">})</span>
+<span class="c1"># Multiply the mass of the leaf mass per unit area by the map of leaf area</span>
+glass_leaf_mass_raster <span class="o">=</span> overlay_maps<span class="p">(</span>best_lai_raster<span class="p">,</span>SLA_raster<span class="p">)</span>
 
 <span class="c1"># Project to an equal area projection</span>
 glass_leaf_mass_raster_moll <span class="o">=</span> projectRaster<span class="p">(</span>glass_leaf_mass_raster<span class="p">,</span>crs<span class="o">=</span>moll<span class="p">)</span>
@@ -12411,7 +12443,7 @@ glass_total_leaf_mass <span class="o">=</span> cellStats<span class="p">(</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the geometric mean of the two estimates for the global mass of leaves</span>
@@ -12455,12 +12487,12 @@ method2_mean <span class="o">=</span> gmean<span class="p">(</span>glass_total_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the geometric mean of the estimates for leaf mass based on glopnet and the map of leaf mass</span>
-best_leaf_meass_remote_sensing <span class="o">=</span> gmean<span class="p">(</span>method1_mean<span class="p">,</span>method2_mean<span class="p">)</span>
-<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best estimate for the total mass of leaves is %.0f Gt&#39;</span><span class="p">,</span> best_leaf_meass_remote_sensing<span class="o">/</span><span class="m">1e15</span><span class="p">)</span>
+best_leaf_mass_remote_sensing <span class="o">=</span> gmean<span class="p">(</span>method1_mean<span class="p">,</span>method2_mean<span class="p">)</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best estimate for the total mass of leaves is %.0f Gt&#39;</span><span class="p">,</span> best_leaf_mass_remote_sensing<span class="o">/</span><span class="m">1e15</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12479,6 +12511,741 @@ best_leaf_meass_remote_sensing <span class="o">=</span> gmean<span class="p">(</
 
 <div class="output_html rendered_html output_subarea ">
 'Our best estimate for the total mass of leaves is 21 Gt'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Estimating-the-global-mass-of-leaves-in-woody-and-herbaceous-plants">Estimating the global mass of leaves in woody and herbaceous plants<a class="anchor-link" href="#Estimating-the-global-mass-of-leaves-in-woody-and-herbaceous-plants">&#182;</a></h1><p>In this section, we estimate the fraction of the global leaf mass that is found in woody plants and herbaceous plants. In order to generate the estimate, we use four different methodologies - with two different leaf area maps (the ground-based LAI map and the remote sensing-based LAI map) and two different conversions from leaf area to leaf mass (one based on glopnet and one based on plant trait maps in Butler et al.).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Produce a mask with the surface area that is covered by herbaceous plants</span>
+<span class="c1"># (grasslands, croplands and cropland/Natural vegetation mosaics)</span>
+herb_raster <span class="o">=</span> <span class="p">(</span>biome_data <span class="o">==</span> <span class="m">10</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>biome_data <span class="o">==</span> <span class="m">12</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>biome_data <span class="o">==</span> <span class="m">14</span><span class="p">)</span>
+
+<span class="c1">## Method 1</span>
+<span class="c1"># Estimate the fraction of herbaceous leaf mass using ground-based leaf area map and</span>
+<span class="c1"># a constant leaf mass per unit leaf area based on glopnet</span>
+
+<span class="c1">#Overlay the maps of herbaceous cover with the ground-based leaf area map</span>
+ground_constant_herb_mass <span class="o">=</span> overlay_maps<span class="p">(</span>herb_raster<span class="p">,</span>asner_lai_raster<span class="p">,</span> calc_sum<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fraction of leaf mass in herbaceous plants</span>
+ground_constant_herb_mass_frac <span class="o">=</span> ground_constant_herb_mass<span class="o">/</span>asner_total_leaf_area
+
+
+<span class="c1">## Method 2</span>
+<span class="c1"># Estimate the fraction of herbaceous leaf mass using remote sensing-based leaf area map and</span>
+<span class="c1"># a constant leaf mass per unit leaf area based on glopnet</span>
+
+<span class="c1">#Overlay the maps of herbaceous cover with the remote sensing-based leaf area map</span>
+rs_constant_herb_mass <span class="o">=</span> overlay_maps<span class="p">(</span>herb_raster<span class="p">,</span>best_lai_raster<span class="p">,</span> calc_sum<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fraction of leaf mass in herbaceous plants</span>
+rs_constant_herb_mass_frac <span class="o">=</span> rs_constant_herb_mass<span class="o">/</span><span class="kp">mean</span><span class="p">(</span>result_MODIS<span class="o">$</span>lai<span class="p">)</span>
+
+<span class="c1">## Method 3</span>
+<span class="c1"># Estimate the fraction of herbaceous leaf mass using ground-based leaf mass map based</span>
+<span class="c1"># on a the leaf mass per unit area map</span>
+
+<span class="c1">#Overlay the maps of herbaceous cover with the ground-based leaf mass map</span>
+ground_butler_herb_mass <span class="o">=</span> overlay_maps<span class="p">(</span>herb_raster<span class="p">,</span>asner_leaf_mass_raster<span class="p">,</span> calc_sum<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fraction of leaf mass in herbaceous plants</span>
+ground_butler_herb_mass_frac <span class="o">=</span> ground_butler_herb_mass<span class="o">/</span>asner_total_leaf_mass
+
+<span class="c1">## Method 4</span>
+<span class="c1"># Estimate the fraction of herbaceous leaf mass using remote sensing-based leaf mass</span>
+<span class="c1"># map based on a the leaf mass per unit area map</span>
+
+<span class="c1">#Overlay the maps of herbaceous cover with the remote sensing-based leaf mass map</span>
+rs_butler_herb_mass <span class="o">=</span> overlay_maps<span class="p">(</span>herb_raster<span class="p">,</span>glass_leaf_mass_raster<span class="p">,</span> calc_sum<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># Calculate the fraction of leaf mass in herbaceous plants</span>
+rs_butler_herb_mass_frac <span class="o">=</span> rs_butler_herb_mass<span class="o">/</span>glass_total_leaf_mass
+
+
+<span class="c1"># Calculate the geometric mean of all methods</span>
+best_herb_mass_frac <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>ground_constant_herb_mass_frac<span class="p">,</span>rs_constant_herb_mass_frac<span class="p">,</span>ground_butler_herb_mass_frac<span class="p">,</span>rs_butler_herb_mass_frac<span class="p">))</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best estimate fraction of leaf mass that is in herbaceous plants is %.0f percent&#39;</span><span class="p">,</span>best_herb_mass_frac<span class="o">*</span><span class="m">100</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1161417 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1161417 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“35086 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“35086 projected point(s) not finite”</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best estimate fraction of leaf mass that is in herbaceous plants is 23 percent'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Estimating-the-total-leaf-mass-of-C4-plants">Estimating the total leaf mass of C4 plants<a class="anchor-link" href="#Estimating-the-total-leaf-mass-of-C4-plants">&#182;</a></h2><p>To estimate the total mass of leaves of C4 plants, we estimate seperately the mass leaves of C4 crops and C4 natural vegetation</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Crops">Crops<a class="anchor-link" href="#Crops">&#182;</a></h3><p>To estimate the total mass of leaves of C4 crops, we rely on the leaf masss maps we constructed in previous sections, in conjunction with maps of the fraction of area that contains C4 crops from <a href="http://dx.doi.org/10.1029/2007GB002947">Monfreda et al.</a>. We use the dominant C4 crops maize, sorghum and sugarcane as an indicator for the amount of C4 crops at every location.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Load data on C4 crops</span>
+maize <span class="o">=</span> raster<span class="p">(</span><span class="s">&#39;../data/C4_leaf_mass/HarvestedAreaYieldMajorCrops_Geotiff/maize_HarvAreaYield_Geotiff/maize_HarvestedAreaFraction.tif&#39;</span><span class="p">)</span>
+sorghum <span class="o">=</span> raster<span class="p">(</span><span class="s">&#39;../data/C4_leaf_mass/HarvestedAreaYieldMajorCrops_Geotiff/sorghum_HarvAreaYield_Geotiff/sorghum_HarvestedAreaFraction.tif&#39;</span><span class="p">)</span>
+sugarcane <span class="o">=</span> raster<span class="p">(</span><span class="s">&#39;../data/C4_leaf_mass/HarvestedAreaYieldMajorCrops_Geotiff/sugarcane_HarvAreaYield_Geotiff/sugarcane_HarvestedAreaFraction.tif&#39;</span><span class="p">)</span>
+C4_crops <span class="o">=</span> <span class="p">(</span>maize<span class="o">+</span>sorghum<span class="o">+</span>sugarcane<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To generate our estimate of the total mass of leaves of C4 crops, we multiply the map of the fraction of surface area covered by C4 crops by our four maps of the total mass of leaves</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>total_C4_crop_leaf_mass1 <span class="o">=</span> overlay_maps<span class="p">(</span>C4_crops<span class="p">,</span>asner_lai_raster<span class="p">,</span> calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
+total_C4_crop_leaf_mass2 <span class="o">=</span> overlay_maps<span class="p">(</span>C4_crops<span class="p">,</span>best_lai_raster<span class="p">,</span> calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
+total_C4_crop_leaf_mass3 <span class="o">=</span> overlay_maps<span class="p">(</span>C4_crops<span class="p">,</span>glass_leaf_mass_raster<span class="p">,</span> calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+total_C4_crop_leaf_mass4 <span class="o">=</span> overlay_maps<span class="p">(</span>C4_crops<span class="p">,</span>asner_leaf_mass_raster<span class="p">,</span> calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="c1">#glass_total_C4_leaf_mass/rs_butler_herb_mass</span>
+best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>total_C4_crop_leaf_mass1<span class="p">,</span>total_C4_crop_leaf_mass2<span class="p">,</span>total_C4_crop_leaf_mass3<span class="p">,</span>total_C4_crop_leaf_mass4<span class="p">))</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1161417 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1686513 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“35086 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“35086 projected point(s) not finite”</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our best estimate of the total mass of leaves in C4 crops is the geometric mean of the four different estimates:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>total_C4_crop_leaf_mass1<span class="p">,</span>total_C4_crop_leaf_mass2<span class="p">,</span>total_C4_crop_leaf_mass3<span class="p">,</span>total_C4_crop_leaf_mass4<span class="p">))</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best esimate for the total mass of leaves of C4 crops is ≈%.1f Gt&#39;</span><span class="p">,</span> best_tot_C4_crop_leaf_mass<span class="o">/</span><span class="m">1e15</span> <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best esimate for the total mass of leaves of C4 crops is ≈0.4 Gt'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Natural-vegetation">Natural vegetation<a class="anchor-link" href="#Natural-vegetation">&#182;</a></h3><p>To estimate the total mass of leaves of natural C4 plants, we rely on a depiction of the fraction of C4 coverage globally (<a href="http://dx.doi.org/10.1029/2001GB001807">Still et al.</a>). Still et al. includes C4 coverage of biomes that are dominated by woody platns such as savanna and shrublands, because these environments include also herbaceous understory. Currently, there is no procedure to directly estimate the fraction of the understory out of the leaf mass in these biomes. Therefore, we generate two estimates of the fraction of C4 plants out of the global leaf mass - one that takes into account the fraction of C4 plants only out of grasslands, and the other includes also savanna and shrublands.</p>
+<h4 id="Estimate-1---C4-only-in-grasslands">Estimate 1 - C4 only in grasslands<a class="anchor-link" href="#Estimate-1---C4-only-in-grasslands">&#182;</a></h4><p>We generate the a map of C4 area coverage only in grasslands. We use the natural C4 plant coverage map in conjunction with the leaf masss maps we constructed in previous sections to generate an estiamte for the total leaf mass of natural C4 plants.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Load the data from Still et al.</span>
+natural_c4_frac <span class="o">=</span> read.asciigrid<span class="p">(</span><span class="s">&#39;../data/C4_leaf_mass/ISLSCP_C4_1DEG_932/data/c4_percent_1d.asc&#39;</span><span class="p">)</span>
+natural_c4_frac <span class="o">=</span> raster<span class="p">(</span>natural_c4_frac<span class="p">)</span><span class="o">/</span><span class="m">100</span>
+natural_c4_frac<span class="p">[</span>natural_c4_frac<span class="o">&lt;</span><span class="m">0</span><span class="p">]</span> <span class="o">=</span> <span class="m">0</span>
+crs<span class="p">(</span>natural_c4_frac<span class="p">)</span> <span class="o">=</span> CRS<span class="p">(</span><span class="s">&quot;+proj=longlat +datum=WGS84&quot;</span><span class="p">)</span>
+
+grasslands_raster <span class="o">=</span> biome_data
+grasslands_raster <span class="o">=</span> grasslands_raster<span class="o">==</span><span class="m">10</span>
+corrected_natural_c4_frac_grassland <span class="o">=</span> overlay_maps<span class="p">(</span>natural_c4_frac<span class="p">,</span>grasslands_raster<span class="p">)</span>
+
+nat_c4_mass_frac_grassland1 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac_grassland<span class="p">,</span>asner_lai_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
+nat_c4_mass_frac_grassland2 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac_grassland<span class="p">,</span>best_lai_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
+nat_c4_mass_frac_grassland3 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac_grassland<span class="p">,</span>asner_leaf_mass_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>crop_extent <span class="o">=</span> extent<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">-180</span><span class="p">,</span><span class="m">180</span><span class="p">,</span><span class="m">-56</span><span class="p">,</span><span class="m">83</span><span class="p">)))</span>
+nat_c4_mass_frac_grassland4 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac_grassland<span class="p">,</span>glass_leaf_mass_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>crop_extent <span class="o">=</span> extent<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">-180</span><span class="p">,</span><span class="m">180</span><span class="p">,</span><span class="m">-56</span><span class="p">,</span><span class="m">83</span><span class="p">)))</span>
+best_nat_c4_mass_frac_grassland <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span>nat_c4_mass_frac_grassland1<span class="p">,</span>nat_c4_mass_frac_grassland2<span class="p">,</span>nat_c4_mass_frac_grassland3<span class="p">,</span>nat_c4_mass_frac_grassland4<span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“10849 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“10849 projected point(s) not finite”</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+0.241228995404157
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Estimate-2---C4-in-all-biomes-expect-croplands">Estimate 2 - C4 in all biomes expect croplands<a class="anchor-link" href="#Estimate-2---C4-in-all-biomes-expect-croplands">&#182;</a></h4><p>We generate the a map of C4 area coverage in grasslands and also savanna and shrublands. We use the natural C4 plant coverage map in conjunction with the leaf masss maps we constructed in previous sections to generate an estiamte for the total leaf mass of natural C4 plants.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Create a mask of land excluding croplands</span>
+crop_raster <span class="o">=</span> biome_data
+crop_raster<span class="p">[</span>crop_raster<span class="o">==</span><span class="m">0</span><span class="p">]</span> <span class="o">=</span> <span class="m">12</span>
+crop_raster<span class="p">[</span>crop_raster<span class="o">!=</span><span class="m">12</span><span class="p">]</span> <span class="o">=</span> <span class="m">1</span>
+crop_raster<span class="p">[</span>crop_raster<span class="o">==</span><span class="m">12</span><span class="p">]</span> <span class="o">=</span> <span class="m">0</span>
+
+
+corrected_natural_c4_frac <span class="o">=</span> overlay_maps<span class="p">(</span>natural_c4_frac<span class="p">,</span>crop_raster<span class="p">)</span>
+
+nat_c4_mass_frac_all1 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac<span class="p">,</span>asner_lai_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
+nat_c4_mass_frac_all2 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac<span class="p">,</span>best_lai_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
+nat_c4_mass_frac_all3 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac<span class="p">,</span>asner_leaf_mass_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>crop_extent <span class="o">=</span> extent<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">-180</span><span class="p">,</span><span class="m">180</span><span class="p">,</span><span class="m">-56</span><span class="p">,</span><span class="m">83</span><span class="p">)))</span>
+nat_c4_mass_frac_all4 <span class="o">=</span> overlay_maps<span class="p">(</span>corrected_natural_c4_frac<span class="p">,</span>glass_leaf_mass_raster<span class="p">,</span>calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span>crop_extent <span class="o">=</span> extent<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">-180</span><span class="p">,</span><span class="m">180</span><span class="p">,</span><span class="m">-56</span><span class="p">,</span><span class="m">83</span><span class="p">)))</span>
+best_nat_c4_mass_frac_all <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span>nat_c4_mass_frac_all1<span class="p">,</span>nat_c4_mass_frac_all2<span class="p">,</span>nat_c4_mass_frac_all3<span class="p">,</span>nat_c4_mass_frac_all4<span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“10849 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“10849 projected point(s) not finite”</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our best estimate for the mass of leaves in C4 plants in natural habitats is the geometric mean of the two estimates using only grasslands or all natural biomes:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>best_nat_c4_leaf_mass <span class="o">=</span> gmean<span class="p">(</span>best_nat_c4_mass_frac_all<span class="p">,</span>best_nat_c4_mass_frac_grassland<span class="p">)</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best esimate for the total mass of leaves of natural C4 plants is ≈%.1f Gt&#39;</span><span class="p">,</span> best_nat_c4_leaf_mass<span class="o">/</span><span class="m">1e15</span> <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best esimate for the total mass of leaves of natural C4 plants is ≈0.9 Gt'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As our best estimate of the total mass of leaves of C4 plants, we sum the our best estimates for the total mass of leaves of C4 crops and natural C4 plants</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>best_tot_C4_leaf_mass <span class="o">=</span> best_nat_c4_leaf_mass<span class="o">+</span>best_tot_C4_crop_leaf_mass
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best esimate for the total mass of leaves of C4 plants is ≈%.1f Gt&#39;</span><span class="p">,</span> best_tot_C4_leaf_mass<span class="o">/</span><span class="m">1e15</span> <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best esimate for the total mass of leaves of C4 plants is ≈1.2 Gt'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We also estimate the fraction of the total herbaceous leaf mass that is contributed by C4 plants:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>tot_herb_leaf_mass <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span>ground_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>rs_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>ground_butler_herb_mass<span class="p">,</span>rs_butler_herb_mass<span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
+best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class="o">/</span>tot_herb_leaf_mass
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best esimate for the fraction of total mass of leaves of herbaceous plants that is in C4 plants is ≈%.0f percent&#39;</span><span class="p">,</span> best_tot_C4_leaf_frac<span class="o">*</span><span class="m">100</span> <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best esimate for the fraction of total mass of leaves of herbaceous plants that is in C4 plants is ≈25 percent'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Uncertainty-analysis">Uncertainty analysis<a class="anchor-link" href="#Uncertainty-analysis">&#182;</a></h1><p>We calculate an uncetainty projection for our estimate of the total mass of leaves based on remote sensing. This is a multiplicative uncertainty akin to a 95% confidence interval. We start with estimating the uncertainty around our estimate of the total area of leaves:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>leaf_area_CI <span class="o">=</span> mul_CI<span class="p">(</span><span class="kt">c</span><span class="p">(</span>asner_total_leaf_area<span class="p">,</span><span class="kp">mean</span><span class="p">(</span>result_MODIS<span class="o">$</span>lai<span class="p">)))</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best projection for the uncertainty associated with our estimate of the total leaf area is %.1f-fold&#39;</span><span class="p">,</span> leaf_area_CI<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best projection for the uncertainty associated with our estimate of the total leaf area is 1.9-fold'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to calculate the total mass of leaves based on remote sensing, we multiply the total leaf mass by the leaf mass per unit leaf area. Next, we calculate the uncertainty associated with our estimate of the leaf mass per unit leaf area. To calculate the characteristic leaf mass per unit leaf area, we relied on an estimate based on a database of plant traits in ≈2000 plant species, and a map of plant traits. For each estimate, we calculate the uncertainty associated with it.</p>
+<h3 id="leaf-mass-per-unit-leaf-area-based-on-species-database">leaf mass per unit leaf area based on species database<a class="anchor-link" href="#leaf-mass-per-unit-leaf-area-based-on-species-database">&#182;</a></h3><p>Our estimate was based on the geomteric mean across plant species. As an estimate of the uncertainty associated with this estimate, we calculate the 95% confidence interval of around the geometric mean of the leaf mass per unit leaf area across all species:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>glopnet_CI <span class="o">=</span> mul_CI<span class="p">(</span>na.exclude<span class="p">(</span>glopnet_data<span class="o">$</span><span class="sb">`log LMA`</span><span class="p">))</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best projection for the uncertainty associated with our estimate of the leaf mass per unit leaf area based on the species database is %.1f-fold&#39;</span><span class="p">,</span> glopnet_CI<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best projection for the uncertainty associated with our estimate of the leaf mass per unit leaf area based on the species database is 1.2-fold'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The uncertainty of 1.2-fold in the estimate of the leaf mass is larger than the uncertainty between our different methodologies (the species based database and the trait maps). Therefore, we use this uncertainty as our best projection of the uncertainty associated with the characteristic mass of leaves per unit leaf area.</p>
+<p>Combining the uncertainty associated with the total area of leaves with the uncertainty associated with our estimate for leaf mass per unit leaf area, we get a projection for the uncertainty associated with the estimate of the total mass of leaves based on remote sensing:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>rs_leaf_mass_CI <span class="o">=</span> CI_prod_prop<span class="p">(</span><span class="kt">c</span><span class="p">(</span>glopnet_CI<span class="p">,</span>leaf_area_CI<span class="p">))</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best projection for the uncertainty associated with our estimate of the total leaf mass based on remote sensing is %.1f-fold&#39;</span><span class="p">,</span> rs_leaf_mass_CI<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best projection for the uncertainty associated with our estimate of the total leaf mass based on remote sensing is 1.9-fold'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Uncertainty-of-the-mass-of-herbaceous-vegetation">Uncertainty of the mass of herbaceous vegetation<a class="anchor-link" href="#Uncertainty-of-the-mass-of-herbaceous-vegetation">&#182;</a></h3><p>In order to evaluate the uncertainty associated with our estimate of the total mass of leaves of herbaceous plants, we calculate the 95% confidence interval of around the geometric mean of the mass of herbaceous leaves out of our four estimates:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>herb_leaf_mass_CI <span class="o">=</span> mul_CI<span class="p">(</span><span class="kt">c</span><span class="p">(</span>ground_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>rs_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>ground_butler_herb_mass<span class="p">,</span>rs_butler_herb_mass<span class="p">))</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best projection for the uncertainty associated with our estimate of the total herbaceous leaf mass is %.1f-fold&#39;</span><span class="p">,</span> herb_leaf_mass_CI<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best projection for the uncertainty associated with our estimate of the total herbaceous leaf mass is 2.4-fold'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Uncertainty-of-the-mass-of-herbaceous-vegetation">Uncertainty of the mass of herbaceous vegetation<a class="anchor-link" href="#Uncertainty-of-the-mass-of-herbaceous-vegetation">&#182;</a></h3><p>In order to evaluate the uncertainty associated with our estimate of the total mass of leaves of C4 plants, we calculate the 95% confidence interval of around the geometric mean of the mass of C$ leaves out of our four estimates:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>C4_leaf_mass_CI <span class="o">=</span> mul_CI<span class="p">(</span><span class="kt">c</span><span class="p">(</span>nat_c4_mass_frac_all1<span class="p">,</span>nat_c4_mass_frac_all2<span class="p">,</span>nat_c4_mass_frac_all3<span class="p">,</span>nat_c4_mass_frac_all4<span class="p">))</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best projection for the uncertainty associated with our estimate of the total C4 leaf mass is %.1f-fold&#39;</span><span class="p">,</span> C4_leaf_mass_CI<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best projection for the uncertainty associated with our estimate of the total C4 leaf mass is 1.8-fold'
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We also estimate the uncertainty associated with our estimate of the fraction of hebaceous leaves that is in C4 plants:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>C4_leaf_mass_frac_CI <span class="o">=</span> CI_prod_prop<span class="p">(</span><span class="kt">c</span><span class="p">(</span>herb_leaf_mass_CI<span class="p">,</span>C4_leaf_mass_CI<span class="p">))</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;Our best projection for the uncertainty associated with our estimate of the fraction of the total herbaceous leaf mass that is in C4 plants is %.1f-fold&#39;</span><span class="p">,</span> C4_leaf_mass_frac_CI<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+'Our best projection for the uncertainty associated with our estimate of the fraction of the total herbaceous leaf mass that is in C4 plants is 2.8-fold'
 </div>
 
 </div>
