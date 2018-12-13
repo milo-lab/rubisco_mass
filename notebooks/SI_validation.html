@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>04_rubisco_rate</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>SI_validation</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11796,7 +11796,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Estimating-the-average-rate-of-rubisco-in-the-wild">Estimating the average rate of rubisco in the wild<a class="anchor-link" href="#Estimating-the-average-rate-of-rubisco-in-the-wild">&#182;</a></h1><p>After estimating the total mass of rubisco in the notebook <a href="03_rubisco_mass_estimate.ipynb"><strong><code>03_rubisco_mass_estimate.ipynb</code></strong></a>, we can use this estimate in order to estimate the average rate of rubisco in the wild, both in the terrestrial and marine environments. We use estimate of the global terrestrial annual rate of carbon fixation, the Gross Primary Productivity (GPP), and convert it to a rate in units of moles of carbon fixed per second. For the terrestrial environment, we our estimate of the global terrestrial GPP is based on <a href="http://dx.doi.org/10.1126/science.1184984">Beer et al.</a>, which estimated it at ≈120 Gt C yr$^{-1}$. We note that the exact value of the global GPP is still debated, it is estimated to be accurate to better than 2 fold (Welp et al. 2011), which for the purposes of our analysis is accurate enough.</p>
+<h1 id="SI-Notebook---Validation-of-our-estimates-for-the-time-averaged-rate-of-Rubisco-in-the-terrestrial-and-marine-environments">SI Notebook - Validation of our estimates for the time-averaged rate of Rubisco in the terrestrial and marine environments<a class="anchor-link" href="#SI-Notebook---Validation-of-our-estimates-for-the-time-averaged-rate-of-Rubisco-in-the-terrestrial-and-marine-environments">&#182;</a></h1><p>In this section, we validate our estimates for the time-averaged rate of Rubisco in the terrestrial and marine environment by comparing our global estimate with estimates of the rate of Rubisco from smaller scale studies. We first discuss terrestrial Rubiscos and then move forward to discuss marine Rubiscos.</p>
+<h2 id="Terrestrial-Rubiscos">Terrestrial Rubiscos<a class="anchor-link" href="#Terrestrial-Rubiscos">&#182;</a></h2><p>For the terrestrial environment, we used data from 18 different Fluxnet sites, located in different biomes. Here is a list of the sites used for validating our estimate:</p>
 
 </div>
 </div>
@@ -11806,16 +11807,278 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The GPP estimate in Beer et al.</span>
-<span class="n">gpp_estimate</span> <span class="o">=</span> <span class="mf">1.2e17</span> <span class="c1">#g C yr^-1</span>
-<span class="n">sec_in_year</span> <span class="o">=</span> <span class="mi">3600</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">365</span> <span class="c1">#s</span>
-<span class="n">NA</span> <span class="o">=</span> <span class="mf">6.022e23</span>
-
-<span class="c1"># Convert GPP to units of moles C per second</span>
-<span class="n">tot_reactions</span> <span class="o">=</span> <span class="p">(</span><span class="n">gpp_estimate</span><span class="o">/</span><span class="n">sec_in_year</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">land_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/validation_data_land.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;site_info&#39;</span><span class="p">)</span>
+<span class="n">land_data</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[2]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Site code</th>
+      <th>Biome</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Canopy N, per unit area [g N m^-2]</th>
+      <th>Canopy N, per unit area [g N m^-2] ref</th>
+      <th>Annual mean LAI</th>
+      <th>Annual mean LAI ref</th>
+      <th>Annual mean GPP [g C m^-2 d^-1]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>US-Ha1</td>
+      <td>DBF</td>
+      <td>42°32′</td>
+      <td>-72°10′</td>
+      <td>1.384267</td>
+      <td>https://doi.org/10.1073/pnas.0810021105 - Calc...</td>
+      <td>1.339365</td>
+      <td>https://doi.org/10.1016/j.agrformet.2014.09.019</td>
+      <td>3.655773</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>US-MMS</td>
+      <td>DBF</td>
+      <td>39°19′</td>
+      <td>-86°24′</td>
+      <td>1.357505</td>
+      <td>https://doi.org/10.1073/pnas.0810021105 - Calc...</td>
+      <td>2.028335</td>
+      <td>https://doi.org/10.1016/j.agrformet.2014.09.019</td>
+      <td>4.612724</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>US-NR1</td>
+      <td>ENF</td>
+      <td>40°01′</td>
+      <td>-105°32′</td>
+      <td>2.292038</td>
+      <td>https://doi.org/10.1073/pnas.0810021105 - Calc...</td>
+      <td>4.000000</td>
+      <td>https://doi.org/10.1073/pnas.0810021105 – Ever...</td>
+      <td>2.402802</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>US-WCr</td>
+      <td>DBF</td>
+      <td>45°48′</td>
+      <td>-90°04′</td>
+      <td>1.187647</td>
+      <td>https://doi.org/10.1073/pnas.0810021105 - Calc...</td>
+      <td>1.940000</td>
+      <td>https://doi.org/10.1016/j.agrformet.2014.09.019</td>
+      <td>3.062149</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AT-Neu</td>
+      <td>GRA</td>
+      <td>47° 7'</td>
+      <td>11° 19'</td>
+      <td>1.200615</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>3.200000</td>
+      <td>https://doi.org/10.1029/2007JD009286</td>
+      <td>5.597917</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>BR-Sa1</td>
+      <td>EBF</td>
+      <td>-2° 51'</td>
+      <td>-54° 57'</td>
+      <td>2.347107</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>5.841036</td>
+      <td>https://doi.org/10.1126/science.aad5068 - Figu...</td>
+      <td>8.836161</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CA-Qfo</td>
+      <td>ENF</td>
+      <td>49° 41'</td>
+      <td>-74° 20'</td>
+      <td>2.182860</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>3.700000</td>
+      <td>https://doi.org/10.1016/j.agrformet.2006.08.00...</td>
+      <td>1.949459</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>CZ-BK1</td>
+      <td>ENF</td>
+      <td>49° 30'</td>
+      <td>18° 32'</td>
+      <td>2.957086</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>4.500000</td>
+      <td>https://doi.org/10.5194/acp-11-2703-2011 - Eve...</td>
+      <td>4.376957</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>DE-Hai</td>
+      <td>DBF</td>
+      <td>51° 4'</td>
+      <td>10° 27'</td>
+      <td>1.417043</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>2.380000</td>
+      <td>https://doi.org/10.1016/j.agrformet.2010.01.014</td>
+      <td>4.488397</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>ES-ES2</td>
+      <td>CRO</td>
+      <td>39° 16'</td>
+      <td>-0° 18'</td>
+      <td>5.820197</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>2.824350</td>
+      <td>https://doi.org/10.3390/rs9010020</td>
+      <td>3.653958</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>FI-Hyy</td>
+      <td>ENF</td>
+      <td>61° 50'</td>
+      <td>24° 17'</td>
+      <td>2.532181</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>3.300000</td>
+      <td>https://www.tandfonline.com/doi/abs/10.1111/j....</td>
+      <td>3.627955</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>FR-Lq1</td>
+      <td>GRA</td>
+      <td>45° 38'</td>
+      <td>2° 44'</td>
+      <td>1.515371</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>0.624768</td>
+      <td>https://doi.org/10.5194/gmd-6-2165-2013+http:/...</td>
+      <td>5.047917</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>IL-Yat</td>
+      <td>ENF</td>
+      <td>31° 20'</td>
+      <td>35° 3'</td>
+      <td>2.211249</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>1.700000</td>
+      <td>https://doi.org/10.1080/01431160903032885</td>
+      <td>1.442500</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>IT-Lav</td>
+      <td>ENF</td>
+      <td>45° 57'</td>
+      <td>11° 16'</td>
+      <td>2.178390</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>9.600000</td>
+      <td>https://doi.org/10.1016/j.agrformet.2003.08.02...</td>
+      <td>5.584167</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>IT-MBo</td>
+      <td>GRA</td>
+      <td>46° 0'</td>
+      <td>11° 2'</td>
+      <td>1.219707</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>0.969062</td>
+      <td>https://doi.org/10.1080/01431160802314855</td>
+      <td>4.252708</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>IT-Ren</td>
+      <td>ENF</td>
+      <td>46° 35'</td>
+      <td>11° 26'</td>
+      <td>3.564986</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>5.500000</td>
+      <td>https://doi.org/10.1016/j.agrformet.2003.08.02...</td>
+      <td>3.192810</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>NL-Loo</td>
+      <td>ENF</td>
+      <td>52° 9'</td>
+      <td>5° 44'</td>
+      <td>3.919266</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>2.000000</td>
+      <td>https://doi.org/10.1016/S0168-1923(02)00024-2 ...</td>
+      <td>4.430625</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>RU-Fyo</td>
+      <td>ENF</td>
+      <td>56° 27'</td>
+      <td>32° 55'</td>
+      <td>1.947685</td>
+      <td>https://doi.org/10.1002/ece3.2479</td>
+      <td>3.000000</td>
+      <td>https://doi.org/10.5194/acp-11-2703-2011 - Eve...</td>
+      <td>4.018575</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -11824,7 +12087,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We then convert our estimate of the total mass of rubisco into moles of rubisco active sites, and divide the GPP by this number to get the average rate of rubisco in units of reactions per second. To convert the total mass of rubisco into moles, we use a characteristic molecular weight of rubisco per active site of ≈70 kDa (including both the large and small subunits of type 1 rubiscos).</p>
+<p>For each site, we calculate the total mass of nitrogen per unit land area by multiplying the mean leaf area index by the nitrogen content per unit leaf area:</p>
 
 </div>
 </div>
@@ -11834,43 +12097,10 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Our estimate for the total mass of rubisco</span>
-<span class="n">tot_rub_mass</span> <span class="o">=</span> <span class="o">.</span><span class="mf">7e15</span> <span class="c1">#g</span>
-
-<span class="c1"># The molecular weight of a rubisco per active site</span>
-<span class="n">rub_mol_w</span> <span class="o">=</span> <span class="mf">7e4</span> <span class="c1"># g/mol</span>
-
-<span class="c1"># Convert the total mass of rubisco into moles</span>
-<span class="n">tot_rub_mol</span> <span class="o">=</span> <span class="p">(</span><span class="n">tot_rub_mass</span><span class="o">/</span><span class="n">rub_mol_w</span><span class="p">)</span>
-
-<span class="c1"># Calculate the average rate of rubisco</span>
-<span class="n">av_rate</span> <span class="o">=</span> <span class="n">tot_reactions</span><span class="o">/</span><span class="n">tot_rub_mol</span> <span class="c1"># s^-1</span>
-<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;We estimate the average rate of Rubisco in the terrestrial environment at </span><span class="si">%.2f</span><span class="s1"> s$^{-1}$&#39;</span> <span class="o">%</span><span class="k">av_rate</span>)
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;N per land area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;Annual mean LAI&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;Canopy N, per unit area [g N m^-2]&#39;</span><span class="p">]</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We estimate the average rate of Rubisco in the terrestrial environment at 0.03 s$^{-1}$</p>
-<hr>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -11879,7 +12109,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We perform the same kind of procedure to calculate the rate of Rubisco in the marine environment. Our estimate for the global marine GPP is based on estimates of the total marine NPP of ≈50 Gt C yr$^{-1}$ from <a href="http://science.sciencemag.org/content/281/5374/237.short">Field et al.</a>, and an estimate that marine GPP is ≈45% larger than NPP based on <a href="http://dx.doi.org/10.1038/nature01165">del Giorgio &amp; Duarte</a></p>
+<p>In order to convert the mass of nitrogen per unit land area into the mass of Rubisco per unit land area, we rely on a recent dataset which recorded the fraction of nitrogen in Rubisco out of the total leaf nitrogen <a href="http://dx.doi.org/10.1111/nph.14496">Onoda et al.</a>. To convert the mass of nitrogen in Rubisco to the total mass of Rubisco, we use the fact that nitrogen accounts for about a sixth of the mass of rubisco. We thus calculate the ratio between the mass of Rubisco and the mass of leaf nitrogen for three main plant types: deciduous woody plants, evengreen woody plants, and herbaceous plants:</p>
 
 </div>
 </div>
@@ -11889,10 +12119,21 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">marine_gpp</span> <span class="o">=</span> <span class="mf">50e15</span><span class="o">*</span><span class="mf">1.45</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">onoda</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/literature_data.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;Onoda&#39;</span><span class="p">)</span>
 
-<span class="c1"># Convert GPP to units of moles C per second</span>
-<span class="n">marine_tot_reactions</span> <span class="o">=</span> <span class="p">(</span><span class="n">marine_gpp</span><span class="o">/</span><span class="n">sec_in_year</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">filt_onoda</span> <span class="o">=</span> <span class="n">onoda</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">onoda</span><span class="p">[</span><span class="s1">&#39;Nrub/N&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">,[</span><span class="s1">&#39;GF&#39;</span><span class="p">,</span><span class="s1">&#39;EveDec&#39;</span><span class="p">,</span><span class="s1">&#39;Nrub/N&#39;</span><span class="p">]]</span>
+
+<span class="c1"># Calculate the mean ratio between the mass of rubisco and leaf N for each growth form</span>
+<span class="n">rub_to_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">filt_onoda</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;GF&#39;</span><span class="p">,</span><span class="s1">&#39;EveDec&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="c1"># For herbaceous plants, clculate the mean of the growth forms &#39;H&#39; and &#39;G&#39; (herbs and grasses)</span>
+<span class="n">rub_to_N</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rub_to_N</span><span class="p">[</span><span class="s1">&#39;GF&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="s1">&#39;Nrub/N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filt_onoda</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt_onoda</span><span class="p">[</span><span class="s1">&#39;GF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">]),</span><span class="s1">&#39;Nrub/N&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">*</span><span class="mi">6</span>
+
+<span class="c1"># Keep only the three relevant growth forms</span>
+<span class="n">rub_to_N</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="s1">&#39;GF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;WD&#39;</span>
+<span class="n">rub_to_N</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="s1">&#39;GF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;WE&#39;</span>
+<span class="n">rub_to_N</span> <span class="o">=</span> <span class="n">rub_to_N</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">:,[</span><span class="s1">&#39;GF&#39;</span><span class="p">,</span><span class="s1">&#39;Nrub/N&#39;</span><span class="p">]]</span>
+<span class="n">rub_to_N</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;GF&#39;</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11904,7 +12145,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In the notebook <a href="03_rubisco_mass_estimate.ipynb"><strong><code>03_rubisco_mass_estimate.ipynb</code></strong></a> we estimated that marine Rubisco enzymes weight ≈0.03 Gt in total. We convert our estimate of the total mass of into moles of rubisco active sites, and divide the GPP by this number to get the average rate of rubisco in units of reactions per second. To convert the total mass of rubisco into moles, we use a characteristic molecular weight of rubisco per active site of ≈70 kDa (including both the large and small subunits of type 1 rubiscos).</p>
+<p>For each biome, we apply the relevant Rubisco content based on the dominant growth form in that biome:</p>
 
 </div>
 </div>
@@ -11914,38 +12155,14 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tot_marine_rub_mass</span> <span class="o">=</span> <span class="mf">0.03e15</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define the mapping between biomes and growth forms</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;DBF&#39;</span><span class="p">:</span><span class="s1">&#39;WD&#39;</span><span class="p">,</span> <span class="s1">&#39;ENF&#39;</span><span class="p">:</span><span class="s1">&#39;WE&#39;</span><span class="p">,</span> <span class="s1">&#39;GRA&#39;</span><span class="p">:</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;EBF&#39;</span><span class="p">:</span><span class="s1">&#39;WE&#39;</span><span class="p">,</span> <span class="s1">&#39;CRO&#39;</span><span class="p">:</span><span class="s1">&#39;H&#39;</span><span class="p">}</span>
 
-<span class="n">tot_marine_rub_mol</span> <span class="o">=</span> <span class="p">(</span><span class="n">tot_marine_rub_mass</span><span class="o">/</span><span class="n">rub_mol_w</span><span class="p">)</span>
-
-<span class="c1"># Calculate the average rate of rubisco</span>
-<span class="n">av_marine_rate</span> <span class="o">=</span> <span class="n">marine_tot_reactions</span><span class="o">/</span><span class="n">tot_marine_rub_mol</span> <span class="c1"># s^-1</span>
-<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;We estimate the average rate of Rubisco in the marine environment at </span><span class="si">%.1f</span><span class="s1"> s$^{-1}$&#39;</span> <span class="o">%</span><span class="k">av_marine_rate</span>)
+<span class="c1"># Multiply the conversion ratio to calculate the total mass of Rubisco per unit land area</span>
+<span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;Rub per land area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;N per land area&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">rub_to_N</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">land_data</span><span class="o">.</span><span class="n">Biome</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mapping</span><span class="p">)]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="s1">&#39;Nrub/N&#39;</span><span class="p">]</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We estimate the average rate of Rubisco in the marine environment at 0.4 s$^{-1}$</p>
-<hr>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -11954,8 +12171,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Uncertainty-analysis">Uncertainty analysis<a class="anchor-link" href="#Uncertainty-analysis">&#182;</a></h1><p>We project the uncertainty associated with our estimates of the time average rates for terrestrial and marine Rubisco.</p>
-<h4 id="Terrestrial-Rubisco">Terrestrial Rubisco<a class="anchor-link" href="#Terrestrial-Rubisco">&#182;</a></h4><p>Our projected uncertainty for our estimate of the total mass of terrestrial Rubisco is about 3-fold. As for the global GPP, estimates range between 120-175 Gt C yr$^{-1}$ (<a href="http://dx.doi.org/10.1126/science.1184984">Beer et al.</a> and <a href="https://doi.org/10.1038/nature10421">Welp et al.</a>). We use this range to project the uncertainty associated with the estimate of the global GPP, and then combine it with the uncertainty associated with the mass of terrestrial Rubisco to generate our projection for the unecrtainty associated with the time average rate of terrestrial Rubisco:</p>
+<p>Now that we have calculated the total mass of Rubisco per unit land area and we have the GPP per unit land area, we can divide the two and convert units to attain the average rate of Rubisco at each site:</p>
 
 </div>
 </div>
@@ -11965,9 +12181,92 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">terr_gpp_CI</span> <span class="o">=</span> <span class="n">mul_CI</span><span class="p">([</span><span class="mi">120</span><span class="p">,</span><span class="mi">175</span><span class="p">])</span>
-<span class="n">terr_av_rate_CI</span> <span class="o">=</span> <span class="n">CI_prod_prop</span><span class="p">([</span><span class="mf">3.4</span><span class="p">,</span><span class="n">terr_gpp_CI</span><span class="p">])</span>
-<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;We project the uncertainty associated with our estimate of the average rate of Rubisco in the terrestrial environment at </span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">terr_av_rate_CI</span>)
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sec_in_day</span> <span class="o">=</span> <span class="mi">3600</span><span class="o">*</span><span class="mi">24</span> <span class="c1">#s</span>
+
+<span class="c1"># Convert GPP to units of moles C per second</span>
+<span class="n">tot_reactions</span> <span class="o">=</span> <span class="p">(</span><span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;Annual mean GPP [g C m^-2 d^-1]&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">sec_in_day</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># The molecular weight of a rubisco per active site</span>
+<span class="n">rub_mol_w</span> <span class="o">=</span> <span class="mf">7e4</span> <span class="c1"># g/mol</span>
+
+<span class="c1"># Convert the total mass of rubisco into moles</span>
+<span class="n">tot_rub_mol</span> <span class="o">=</span> <span class="p">(</span><span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;Rub per land area&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">rub_mol_w</span><span class="p">)</span>
+
+<span class="c1"># Calculate the average rate of rubisco</span>
+<span class="n">land_data</span><span class="p">[</span><span class="s1">&#39;Average rate [s^-1]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tot_reactions</span><span class="o">/</span><span class="n">tot_rub_mol</span> <span class="c1"># s^-1</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, we calculate the average rate of rubisco across sites in the same biome:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">biome_rate</span> <span class="o">=</span> <span class="n">land_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Biome&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()[</span><span class="s1">&#39;Average rate [s^-1]&#39;</span><span class="p">]</span>
+<span class="n">biome_rate</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[7]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Biome
+CRO    0.011781
+DBF    0.083973
+EBF    0.049176
+ENF    0.028257
+GRA    0.183501
+Name: Average rate [s^-1], dtype: float64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, to calculate a global average rate for Rubisco based on Fluxnet sites, we calculate a weighted average of the rates of Rubisco at each biome. We use the mass of Rubisco at each biome as the weights for our weighted average. To calculate a proxy for the mass of Rubisco at each biome, we use the global GPP at each biome based on <a href="http://dx.doi.org/10.1126/science.1184984">Beer et al.</a> and divide it by the average rate at each biome.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">biome_gpp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/validation_data_land.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;global_gpp&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">global_average_rate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">biome_rate</span><span class="p">,</span><span class="n">weights</span><span class="o">=</span><span class="n">biome_gpp</span><span class="p">[</span><span class="s1">&#39;Global GPP [Gt C yr^-1]&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">biome_rate</span><span class="p">)</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our best estimate for the average rate of Rubisco on land based on Flxunet sites is </span><span class="si">%.2f</span><span class="s1"> s^-1&#39;</span> <span class="o">%</span><span class="k">global_average_rate</span>)
 </pre></div>
 
 </div>
@@ -11986,7 +12285,7 @@ div#notebook {
 
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We project the uncertainty associated with our estimate of the average rate of Rubisco in the terrestrial environment at 3.5-fold</p>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our best estimate for the average rate of Rubisco on land based on Flxunet sites is 0.04 s^-1</p>
 <hr>
 
 </div>
@@ -12001,18 +12300,188 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Marine-Rubisco">Marine Rubisco<a class="anchor-link" href="#Marine-Rubisco">&#182;</a></h4><p>Our projected uncertainty for our estimate of the total mass of marine Rubisco is about 6-fold. As for the global marine GPP, we do not have a good source for estimating the uncertainty associated with it. We use 2-fold uncertianty as our estimate for the uncertainty associated with the estimate of the global marine GPP. We combine the uncertainties associated with our estimate of the total mass of marine Rubisco and the global marine GPP to generate our projection for the uncertainty associated with our estimate of the average rate of marine Rubisco:</p>
+<p>Our result is very close to our best estimate of 0.03 s$^{-1}$.</p>
+<h2 id="Marine-Rubiscos">Marine Rubiscos<a class="anchor-link" href="#Marine-Rubiscos">&#182;</a></h2><p>For marine Rubiscos, we rely of continuous time series from two sites - one is the ALOHA site near Hawaii and the second is the BATS site near Bermuda.
+For each one, we collected data on primary productivity from $^{14}$C incorporation experiments, as well data on the concentration of three different phtoplankton groups - <em>Prochlorococcus</em>, <em>Synechococcus</em> and Picoeukaryotes. We suplement the measured phytoplankton data with measurements of eukaryotic phytoplankton from <a href="https://doi.org/10.1016/j.dsr2.2013.01.007">Pasulka et al.</a> for the ALOHA site and from <a href="https://doi.org/10.1016/S0967-0645(00">DuRand et al.</a>00166-1) for the BATS site. For each site, we follow a similar analysis which includes the following steps:</p>
+<ol>
+<li>Conversion of cell population density into carbon density</li>
+<li>Averaging over the entire time-series</li>
+<li>Integration over the entire depth column for biomass and primary productivity</li>
+<li>Conversion of biomass into the mass of Rubisco</li>
+</ol>
+<p>The data on the biomass of eukaryotic phytoplankton at the ALOHA site come from measurements between the years 2004 and 2009, whereas the measurements of the phytoplankton biomass at the BATS site come from measurements between the years 1992 and 1993. We use the relevant time-series data for primary productivity in order to calculate the average rate of Rubisco at the same time period.</p>
+<h4 id="Conversion-of-population-density-into-carbon-density">Conversion of population density into carbon density<a class="anchor-link" href="#Conversion-of-population-density-into-carbon-density">&#182;</a></h4><p>For the BATS site, we already have a depth integrated measurement of the carbon mass of phytoplankton, so we skip steps 1 and 3. For the ALOHA site, we have measurements of the cell population density for <em>Prochlorococcus</em> and <em>Synechococcus</em>, which we convert to carbon mass using values from <a href="http://dx.doi.org/10.5194/essd-4-37-2012">Buitenhuis et al.</a> of 48 fg C cell^-1 for <em>Prochlorococcus</em> and 204 fg cell^-1 for <em>Synechococcus</em>. The carbon mass of the other eukaryotic phytoplankton was already calculated by <a href="https://doi.org/10.1016/j.dsr2.2013.01.007">Pasulka et al.</a>.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mar_av_rate_CI</span> <span class="o">=</span> <span class="n">CI_prod_prop</span><span class="p">([</span><span class="mf">5.9</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;We project the uncertainty associated with our estimate of the average rate of Rubisco in the marine environment at </span><span class="si">%.1f</span><span class="s1">-fold&#39;</span> <span class="o">%</span><span class="k">mar_av_rate_CI</span>)
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># load data</span>
+<span class="n">aloha_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/validation_data_marine.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;hot_data&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">bats_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/validation_data_marine.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;bats_data&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">aloha_phyto_euk</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/validation_data_marine.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;hots_euks&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">bats_phyto</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;../data/validation_data_marine.xlsx&#39;</span><span class="p">,</span><span class="s1">&#39;bats_phytoplankton&#39;</span><span class="p">,</span><span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># average productivity measurements in ALOHA from the three replicates</span>
+<span class="n">aloha_data</span><span class="p">[</span><span class="s1">&#39;NPP [mg C m^-3]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aloha_data</span><span class="p">[[</span><span class="s1">&#39;14C PP light #3 [mg C/m3]&#39;</span><span class="p">,</span><span class="s1">&#39;14C PP light #2 [mg C/m3]&#39;</span><span class="p">,</span><span class="s1">&#39;14C PP light #1 [mg C/m3]&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="c1"># Choose only the relevant data from the ALOHA site</span>
+<span class="n">aloha_data</span> <span class="o">=</span> <span class="n">aloha_data</span><span class="p">[[</span><span class="s1">&#39;Depth [m]&#39;</span><span class="p">,</span><span class="s1">&#39;Prochl [#/ml]&#39;</span><span class="p">,</span><span class="s1">&#39;Synecho [#/ml]&#39;</span><span class="p">,</span><span class="s1">&#39;NPP [mg C m^-3]&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># Convert to carbon biomass for Prochlorococcus and Synechococcus at the ALOHA site</span>
+<span class="n">aloha_data</span><span class="p">[</span><span class="s1">&#39;Pro C [mg C m^-3]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aloha_data</span><span class="p">[</span><span class="s1">&#39;Prochl [#/ml]&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">48e-12</span><span class="o">*</span><span class="mf">1e6</span>
+<span class="n">aloha_data</span><span class="p">[</span><span class="s1">&#39;Syn C [mg C m^-3]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aloha_data</span><span class="p">[</span><span class="s1">&#39;Synecho [#/ml]&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">204e-12</span><span class="o">*</span><span class="mf">1e6</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Averaging-over-the-entire-time-series">Averaging over the entire time-series<a class="anchor-link" href="#Averaging-over-the-entire-time-series">&#182;</a></h3><p>We use the relevate time period for the ALOHA and BATS sites as discussed above. We average across all measurements at the same depth.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Average ALOHA data</span>
+<span class="n">avg_aloha</span> <span class="o">=</span> <span class="n">aloha_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Depth [m]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Average BATS data</span>
+<span class="n">avg_bats</span> <span class="o">=</span> <span class="n">bats_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Depth [m]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Average ALOHA eukaryotic phytoplankton biomass</span>
+<span class="n">avg_aloha_euk</span> <span class="o">=</span> <span class="n">aloha_phyto_euk</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Average BATS phytoplankton biomass</span>
+<span class="n">avg_bats_phyto</span> <span class="o">=</span> <span class="n">bats_phyto</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Integration-over-the-water-column">Integration over the water column<a class="anchor-link" href="#Integration-over-the-water-column">&#182;</a></h4><p>For the phytoplankton biomass data of the BATS site, measurements are already depth integrated. For the other measurements, we integrated measurements across the water column by multiplying the values by the volume of water in each water depth.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">int_aloha</span> <span class="o">=</span> <span class="n">avg_aloha</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">avg_aloha</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">int_bats</span> <span class="o">=</span> <span class="n">avg_bats</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">avg_bats</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">int_aloha_euk</span> <span class="o">=</span> <span class="n">avg_aloha_euk</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">avg_aloha_euk</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Conversion-of-biomass-to-Rubisco-mass">Conversion of biomass to Rubisco mass<a class="anchor-link" href="#Conversion-of-biomass-to-Rubisco-mass">&#182;</a></h4><p>First, we sum over all the carbon biomass of phytoplankton at the ALOHA site. We assume carbon is 50% of the dry weight of phytoplankton and that protein are also about 50% of the dry weight, so the carbon mass is equal to the protein mass. Then we use the average fraction of Rubisco out the total protein mass of 3%.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">aloha_rub</span> <span class="o">=</span> <span class="p">(</span><span class="n">int_aloha</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">int_aloha_euk</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span><span class="o">*</span><span class="mf">0.03</span>
+<span class="n">bats_rub</span> <span class="o">=</span> <span class="n">avg_bats_phyto</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mf">0.03</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The last part in our analysis is dividing the GPP per unit area in each site by the total mass of Rubisco per unit area to attain the average rate of Rubisco at each site. We assume GPP is 2-fold larger than the measured NPP at each site.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Convert GPP to units of moles C per second</span>
+<span class="n">aloha_tot_reactions</span> <span class="o">=</span> <span class="p">(</span><span class="n">int_aloha</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NPP [mg C m^-3]&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="n">sec_in_day</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># The molecular weight of a rubisco per active site</span>
+<span class="n">rub_mol_w</span> <span class="o">=</span> <span class="mf">7e4</span> <span class="c1"># g/mol</span>
+
+<span class="c1"># Convert the total mass of rubisco into moles</span>
+<span class="n">aloha_rub_mol</span> <span class="o">=</span> <span class="p">(</span><span class="n">aloha_rub</span><span class="o">/</span><span class="n">rub_mol_w</span><span class="p">)</span>
+
+<span class="c1"># Calculate the average rate of rubisco</span>
+<span class="n">aloha_rate</span> <span class="o">=</span> <span class="n">aloha_tot_reactions</span><span class="o">/</span><span class="n">aloha_rub_mol</span> <span class="c1"># s^-1</span>
+
+<span class="c1"># Convert GPP to units of moles C per second</span>
+<span class="n">bats_tot_reactions</span> <span class="o">=</span> <span class="p">(</span><span class="n">int_bats</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NPP [mg C m^-3 d^-1]&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="n">sec_in_day</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># The molecular weight of a rubisco per active site</span>
+<span class="n">rub_mol_w</span> <span class="o">=</span> <span class="mf">7e4</span> <span class="c1"># g/mol</span>
+
+<span class="c1"># Convert the total mass of rubisco into moles</span>
+<span class="n">bats_rub_mol</span> <span class="o">=</span> <span class="p">(</span><span class="n">bats_rub</span><span class="o">/</span><span class="n">rub_mol_w</span><span class="p">)</span>
+
+<span class="c1"># Calculate the average rate of rubisco</span>
+<span class="n">bats_rate</span> <span class="o">=</span> <span class="n">bats_tot_reactions</span><span class="o">/</span><span class="n">bats_rub_mol</span> <span class="c1"># s^-1</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We calculate the average rate between the two sites:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">marine_avg</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">aloha_rate</span><span class="p">,</span><span class="n">bats_rate</span><span class="p">])</span>
+<span class="n">dis_res</span><span class="p">(</span><span class="s1">&#39;Our best estimate for the average rate of Rubisco in the ocean based on data from ALOHA and BATS is </span><span class="si">%.1f</span><span class="s1"> s^-1&#39;</span> <span class="o">%</span><span class="k">marine_avg</span>)
 </pre></div>
 
 </div>
@@ -12031,7 +12500,7 @@ div#notebook {
 
 <div class="output_markdown rendered_html output_subarea ">
 <hr>
-<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>We project the uncertainty associated with our estimate of the average rate of Rubisco in the marine environment at 6.7-fold</p>
+<h5 id="Result:"><strong>Result</strong>:<a class="anchor-link" href="#Result:">&#182;</a></h5><p>Our best estimate for the average rate of Rubisco in the ocean based on data from ALOHA and BATS is 1.4 s^-1</p>
 <hr>
 
 </div>
@@ -12041,6 +12510,15 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This value is about 2-fold higher than our best estimate of 0.6 s$^{-1}$.</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>
