@@ -11776,7 +11776,9 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="c1"># Import dependencies</span>
+<div class=" highlight hl-r"><pre><span></span><span class="kp">options</span><span class="p">(</span>warn<span class="o">=</span><span class="m">-1</span><span class="p">)</span>
+
+<span class="c1"># Import dependencies</span>
 <span class="kn">library</span><span class="p">(</span>rgdal<span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>raster<span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>gdalUtils<span class="p">)</span>
@@ -11885,14 +11887,14 @@ overlay_maps <span class="o">=</span> <span class="kr">function</span><span clas
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Loading required package: sp
-rgdal: version: 1.3-3, (SVN revision 759)
+rgdal: version: 1.3-6, (SVN revision 773)
  Geospatial Data Abstraction Library extensions to R successfully loaded
- Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
- Path to GDAL shared files: /usr/share/gdal/2.2
+ Loaded GDAL runtime: GDAL 2.3.2, released 2018/09/21
+ Path to GDAL shared files: /usr/share/gdal
  GDAL binary built with GEOS: TRUE 
- Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+ Loaded PROJ.4 runtime: Rel. 5.1.0, June 1st, 2018, [PJ_VERSION: 510]
  Path to PROJ.4 shared files: (autodetected)
- Linking to sp version: 1.2-5 
+ Linking to sp version: 1.3-1 
 Loading required package: viridisLite
 Loading required package: lattice
 Loading required package: latticeExtra
@@ -12025,6 +12027,20 @@ asner_LAI_data
 <div class="output_wrapper">
 <div class="output">
 
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>readxl works best with a newer version of the tibble package.
+You currently have tibble v1.4.2.
+Falling back to column name repair from tibble &lt;= v1.4.2.
+Message displays once per session.
+</pre>
+</div>
+</div>
 
 <div class="output_area">
 
@@ -12185,17 +12201,6 @@ asner_total_leaf_area <span class="o">=</span> cellStats<span class="p">(</span>
 <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“1161417 projected point(s) not finite”</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
 
 <div class="output_html rendered_html output_subarea ">
 'We estimate the total leaf area based on field measurements at: 3.1e+14 m^2'
@@ -12261,7 +12266,7 @@ best_global_leaf_area <span class="o">=</span> gmean<span class="p">(</span>asne
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load glopnet data</span>
@@ -12310,7 +12315,7 @@ method1_mean <span class="o">=</span> best_global_leaf_area<span class="o">*</sp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load SMA data</span>
@@ -12335,24 +12340,6 @@ SLA_raster <span class="o">=</span> raster<span class="p">(</span>SLA_df<span cl
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in points2grid(points, tolerance, round):
-“grid has empty column/rows in dimension 1”</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -12365,7 +12352,7 @@ SLA_raster <span class="o">=</span> raster<span class="p">(</span>SLA_df<span cl
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the leaf mass based on ground measurements of LAI</span>
@@ -12383,28 +12370,10 @@ asner_total_leaf_mass <span class="o">=</span> cellStats<span class="p">(</span>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“35086 projected point(s) not finite”</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the leaf mass based on remote sensing measurements of LAI</span>
@@ -12422,28 +12391,10 @@ glass_total_leaf_mass <span class="o">=</span> cellStats<span class="p">(</span>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“35086 projected point(s) not finite”</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the geometric mean of the two estimates for the global mass of leaves</span>
@@ -12487,7 +12438,7 @@ method2_mean <span class="o">=</span> gmean<span class="p">(</span>glass_total_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Calculate the geometric mean of the estimates for leaf mass based on glopnet and the map of leaf mass</span>
@@ -12530,7 +12481,7 @@ best_leaf_mass_remote_sensing <span class="o">=</span> gmean<span class="p">(</s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Produce a mask with the surface area that is covered by herbaceous plants</span>
@@ -12597,23 +12548,9 @@ best_herb_mass_frac <span class="o">=</span> <span class="kp">prod</span><span c
 <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“1161417 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“1161417 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“35086 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“35086 projected point(s) not finite”</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
 
 <div class="output_html rendered_html output_subarea ">
-'Our best estimate fraction of leaf mass that is in herbaceous plants is 23 percent'
+'Our best estimate fraction of leaf mass that is in herbaceous plants is 22 percent'
 </div>
 
 </div>
@@ -12642,7 +12579,7 @@ best_herb_mass_frac <span class="o">=</span> <span class="kp">prod</span><span c
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load data on C4 crops</span>
@@ -12668,7 +12605,7 @@ C4_crops <span class="o">=</span> <span class="p">(</span>maize<span class="o">+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>total_C4_crop_leaf_mass1 <span class="o">=</span> overlay_maps<span class="p">(</span>C4_crops<span class="p">,</span>asner_lai_raster<span class="p">,</span> calc_sum <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span><span class="o">*</span><span class="m">100</span>
@@ -12680,27 +12617,6 @@ best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“1161417 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“1686513 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“35086 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“35086 projected point(s) not finite”</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -12716,7 +12632,7 @@ best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>total_C4_crop_leaf_mass1<span class="p">,</span>total_C4_crop_leaf_mass2<span class="p">,</span>total_C4_crop_leaf_mass3<span class="p">,</span>total_C4_crop_leaf_mass4<span class="p">))</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
@@ -12738,7 +12654,7 @@ best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span>
 
 
 <div class="output_html rendered_html output_subarea ">
-'Our best esimate for the total mass of leaves of C4 crops is ≈0.4 Gt'
+'Our best esimate for the total mass of leaves of C4 crops is ≈0.3 Gt'
 </div>
 
 </div>
@@ -12759,7 +12675,7 @@ best_tot_C4_crop_leaf_mass <span class="o">=</span> <span class="kp">prod</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load the data from Still et al.</span>
@@ -12783,39 +12699,6 @@ best_nat_c4_mass_frac_grassland <span class="o">=</span> <span class="kp">prod</
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“10849 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“10849 projected point(s) not finite”</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-0.241228995404157
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -12828,7 +12711,7 @@ best_nat_c4_mass_frac_grassland <span class="o">=</span> <span class="kp">prod</
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Create a mask of land excluding croplands</span>
@@ -12851,27 +12734,6 @@ best_nat_c4_mass_frac_all <span class="o">=</span> <span class="kp">prod</span><
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“11822 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“10849 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“10849 projected point(s) not finite”</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -12884,7 +12746,7 @@ best_nat_c4_mass_frac_all <span class="o">=</span> <span class="kp">prod</span><
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>best_nat_c4_leaf_mass <span class="o">=</span> gmean<span class="p">(</span>best_nat_c4_mass_frac_all<span class="p">,</span>best_nat_c4_mass_frac_grassland<span class="p">)</span>
@@ -12926,7 +12788,7 @@ best_nat_c4_mass_frac_all <span class="o">=</span> <span class="kp">prod</span><
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>best_tot_C4_leaf_mass <span class="o">=</span> best_nat_c4_leaf_mass<span class="o">+</span>best_tot_C4_crop_leaf_mass
@@ -12968,7 +12830,7 @@ best_nat_c4_mass_frac_all <span class="o">=</span> <span class="kp">prod</span><
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>tot_herb_leaf_mass <span class="o">=</span> <span class="kp">prod</span><span class="p">(</span>ground_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>rs_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>ground_butler_herb_mass<span class="p">,</span>rs_butler_herb_mass<span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="m">1</span><span class="o">/</span><span class="m">4</span><span class="p">)</span>
@@ -12991,7 +12853,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 
 
 <div class="output_html rendered_html output_subarea ">
-'Our best esimate for the fraction of total mass of leaves of herbaceous plants that is in C4 plants is ≈25 percent'
+'Our best esimate for the fraction of total mass of leaves of herbaceous plants that is in C4 plants is ≈26 percent'
 </div>
 
 </div>
@@ -13011,7 +12873,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>leaf_area_CI <span class="o">=</span> mul_CI<span class="p">(</span><span class="kt">c</span><span class="p">(</span>asner_total_leaf_area<span class="p">,</span><span class="kp">mean</span><span class="p">(</span>result_MODIS<span class="o">$</span>lai<span class="p">)))</span>
@@ -13054,7 +12916,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>glopnet_CI <span class="o">=</span> mul_CI<span class="p">(</span>na.exclude<span class="p">(</span>glopnet_data<span class="o">$</span><span class="sb">`log LMA`</span><span class="p">))</span>
@@ -13097,7 +12959,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>rs_leaf_mass_CI <span class="o">=</span> CI_prod_prop<span class="p">(</span><span class="kt">c</span><span class="p">(</span>glopnet_CI<span class="p">,</span>leaf_area_CI<span class="p">))</span>
@@ -13139,7 +13001,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>herb_leaf_mass_CI <span class="o">=</span> mul_CI<span class="p">(</span><span class="kt">c</span><span class="p">(</span>ground_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>rs_constant_herb_mass<span class="o">*</span><span class="m">100</span><span class="p">,</span>ground_butler_herb_mass<span class="p">,</span>rs_butler_herb_mass<span class="p">))</span>
@@ -13161,7 +13023,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 
 
 <div class="output_html rendered_html output_subarea ">
-'Our best projection for the uncertainty associated with our estimate of the total herbaceous leaf mass is 2.4-fold'
+'Our best projection for the uncertainty associated with our estimate of the total herbaceous leaf mass is 2.5-fold'
 </div>
 
 </div>
@@ -13181,7 +13043,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>C4_leaf_mass_CI <span class="o">=</span> mul_CI<span class="p">(</span><span class="kt">c</span><span class="p">(</span>nat_c4_mass_frac_all1<span class="p">,</span>nat_c4_mass_frac_all2<span class="p">,</span>nat_c4_mass_frac_all3<span class="p">,</span>nat_c4_mass_frac_all4<span class="p">))</span>
@@ -13203,7 +13065,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 
 
 <div class="output_html rendered_html output_subarea ">
-'Our best projection for the uncertainty associated with our estimate of the total C4 leaf mass is 1.8-fold'
+'Our best projection for the uncertainty associated with our estimate of the total C4 leaf mass is 1.9-fold'
 </div>
 
 </div>
@@ -13223,7 +13085,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>C4_leaf_mass_frac_CI <span class="o">=</span> CI_prod_prop<span class="p">(</span><span class="kt">c</span><span class="p">(</span>herb_leaf_mass_CI<span class="p">,</span>C4_leaf_mass_CI<span class="p">))</span>
@@ -13245,7 +13107,7 @@ best_tot_C4_leaf_frac <span class="o">=</span> best_tot_C4_leaf_mass<span class=
 
 
 <div class="output_html rendered_html output_subarea ">
-'Our best projection for the uncertainty associated with our estimate of the fraction of the total herbaceous leaf mass that is in C4 plants is 2.8-fold'
+'Our best projection for the uncertainty associated with our estimate of the fraction of the total herbaceous leaf mass that is in C4 plants is 3.1-fold'
 </div>
 
 </div>

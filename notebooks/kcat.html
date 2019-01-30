@@ -11773,7 +11773,7 @@ div#notebook {
 
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[160]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Import dependencies</span>
@@ -11794,6 +11794,43 @@ moll <span class="o">=</span> <span class="s">&#39;+proj=moll +lon_0=0 +x_0=0 +y
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Loading required package: sp
+rgdal: version: 1.3-6, (SVN revision 773)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 2.3.2, released 2018/09/21
+ Path to GDAL shared files: /usr/share/gdal
+ GDAL binary built with GEOS: TRUE 
+ Loaded PROJ.4 runtime: Rel. 5.1.0, June 1st, 2018, [PJ_VERSION: 510]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.3-1 
+Loading required package: viridisLite
+Loading required package: lattice
+Loading required package: latticeExtra
+Loading required package: RColorBrewer
+
+Attaching package: ‘latticeExtra’
+
+The following object is masked from ‘package:ggplot2’:
+
+    layer
+
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -11818,7 +11855,7 @@ moll <span class="o">=</span> <span class="s">&#39;+proj=moll +lon_0=0 +x_0=0 +y
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[82]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load data</span>
@@ -11843,7 +11880,11 @@ filt_rub_data <span class="o">=</span> rubisco_data<span class="p">[</span><span
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
+<pre>readxl works best with a newer version of the tibble package.
+You currently have tibble v1.4.2.
+Falling back to column name repair from tibble &lt;= v1.4.2.
+Message displays once per session.
+Warning message in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
 “Expecting numeric in T1170 / R1170C20: got &#39;HCO3-&#39;”Warning message in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
 “Expecting numeric in Y1170 / R1170C25: got &#39;C3 plants&#39;”Warning message in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
 “Expecting numeric in Z1170 / R1170C26: got &#39;Unclear what temperature this is at from the paper.&#39;”Warning message in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
@@ -11892,7 +11933,7 @@ filt_rub_data <span class="o">=</span> rubisco_data<span class="p">[</span><span
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[92]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>group_mean <span class="o">=</span> aggregate<span class="p">(</span>filt_rub_data<span class="o">$</span>vC<span class="p">,</span> by<span class="o">=</span><span class="kt">list</span><span class="p">(</span>filt_rub_data<span class="o">$</span>taxonomy<span class="p">),</span> FUN<span class="o">=</span><span class="kp">mean</span><span class="p">)</span>
@@ -11914,7 +11955,7 @@ filt_rub_data <span class="o">=</span> rubisco_data<span class="p">[</span><span
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[80]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Load data on the biomass of each plankton group</span>
@@ -11970,7 +12011,7 @@ mean_marine_kcat <span class="o">=</span> weighted.mean<span class="p">(</span>x
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[90]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Take only land plant groups</span>
@@ -12019,7 +12060,7 @@ mean_terrestrial_kcat <span class="o">=</span> <span class="kp">mean</span><span
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[491]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Find all data files </span>
@@ -12112,7 +12153,8 @@ marine_amb_temp <span class="o">=</span> nume<span class="o">/</span>deno
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+<pre>Loading required namespace: ncdf4
+Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
 “55946 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
 “55946 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
 “55946 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
@@ -12158,7 +12200,7 @@ marine_amb_temp <span class="o">=</span> nume<span class="o">/</span>deno
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[492]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Find all data files </span>
@@ -12231,78 +12273,16 @@ land_amb_temp <span class="o">=</span> nume<span class="o">/</span>deno
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“424198 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“137404 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“27670 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“9072 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“74502 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“254518 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“253259 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“417960 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“140054 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“30814 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“7008 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“59997 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“211452 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“313338 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“456400 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“120392 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“13996 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“38364 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“207407 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“344064 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“414776 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“141324 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“32452 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“6264 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“53525 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“192430 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“339852 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“419012 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“139620 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“30280 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“7296 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“62267 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“218144 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“304004 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“402712 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“145686 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“38731 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“5046 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“33835 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“134171 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“367035 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“53407 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“398170 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“147141 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“41106 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“5145 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“28112 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“116781 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“315203 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“128965 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“401584 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“146056 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“39323 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“5045 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“32334 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“129655 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“352859 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“73767 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“429264 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“135108 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“25178 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“11424 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“88307 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“296593 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“194749 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“410460 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“142968 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“34686 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“5558 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“45653 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“169300 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
-“371998 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
+“1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
 “1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
 “1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
 “1180623 projected point(s) not finite”Warning message in rgdal::rawTransform(projto_int, projfrom, nrow(xy), xy[, 1], :
@@ -12347,7 +12327,7 @@ land_amb_temp <span class="o">=</span> nume<span class="o">/</span>deno
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[493]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>q10 <span class="o">=</span> <span class="kp">sqrt</span><span class="p">(</span><span class="kp">prod</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">2.2</span><span class="p">,</span><span class="m">2.9</span><span class="p">)))</span>
@@ -12355,7 +12335,7 @@ marine_max_rate <span class="o">=</span> mean_marine_kcat<span class="o">/</span
 <span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;We estimate the maximal rate of Rubisco in the marine environment at %.1f s^-1&#39;</span><span class="p">,</span>marine_max_rate<span class="p">)</span>
 
 land_max_rate <span class="o">=</span> mean_terrestrial_kcat<span class="o">/</span><span class="p">(</span>q10<span class="o">^</span><span class="p">((</span><span class="m">25</span><span class="o">-</span>land_amb_temp<span class="p">)</span><span class="o">/</span><span class="m">10</span><span class="p">))</span>
-<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;We estimate the maximal rate of Rubisco in the marine environment at %.1f s^-1&#39;</span><span class="p">,</span>land_max_rate<span class="p">)</span>
+<span class="kp">sprintf</span><span class="p">(</span><span class="s">&#39;We estimate the maximal rate of Rubisco in the terrestrial environment at %.1f s^-1&#39;</span><span class="p">,</span>land_max_rate<span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12385,7 +12365,7 @@ land_max_rate <span class="o">=</span> mean_terrestrial_kcat<span class="o">/</s
 
 
 <div class="output_html rendered_html output_subarea ">
-'We estimate the maximal rate of Rubisco in the marine environment at 3.0 s^-1'
+'We estimate the maximal rate of Rubisco in the terrestrial environment at 3.0 s^-1'
 </div>
 
 </div>
@@ -12405,7 +12385,7 @@ land_max_rate <span class="o">=</span> mean_terrestrial_kcat<span class="o">/</s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[495]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># We take the middle of each month as a representative day for calculating the number of light hours</span>
