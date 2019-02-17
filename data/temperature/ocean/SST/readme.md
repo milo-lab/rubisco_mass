@@ -1,1 +1,1 @@
-asdas
+Please note that the file THETA.2015.nc should appear in this directory. Because the file is too large to host on github, you need to download it from ftp://ecco.jpl.nasa.gov/Version4/Release3/interp_monthly/THETA/THETA.2015.nc and place it in this directory
